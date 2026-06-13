@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>私人科技壁纸库 | 闪电图床对接</title>
+    <title>私人科技壁纸库 | 闪电图床NSFW接口版</title>
     <style>
         * {
             margin: 0;
@@ -22,7 +22,6 @@
             max-width: 1400px;
             margin: 0 auto;
         }
-        /* 头部标题 */
         header {
             text-align: center;
             padding: 2rem 0;
@@ -40,7 +39,6 @@
             color: rgba(255,255,255,0.5);
             margin-top: 0.8rem;
         }
-        /* 功能按钮栏 */
         .tool-bar {
             text-align: center;
             margin-bottom: 1.5rem;
@@ -65,7 +63,6 @@
         #import-file {
             display: none;
         }
-        /* 上传区域 科技风毛玻璃 */
         .upload-box {
             background: rgba(25, 35, 60, 0.5);
             backdrop-filter: blur(12px);
@@ -99,19 +96,16 @@
             color: rgba(255,255,255,0.4);
             font-size: 0.9rem;
         }
-        /* 加载提示 */
         .loading {
             color: #00d8ff;
             margin-top: 1rem;
             display: none;
         }
-        /* 壁纸网格 */
         .wall-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 24px;
         }
-        /* 壁纸卡片 */
         .wall-card {
             background: rgba(25, 35, 60, 0.6);
             backdrop-filter: blur(8px);
@@ -168,7 +162,6 @@
             color: rgba(255,255,255,0.3);
             padding: 3rem 0;
         }
-        /* 全屏预览遮罩 */
         .preview-mask {
             position: fixed;
             top: 0;
@@ -208,36 +201,30 @@
             <h1>私人科技壁纸库</h1>
             <p class="desc">对接闪电图床 | 上传 · 预览 · 下载 · 管理</p>
         </header>
-        <!-- 导入导出工具栏 -->
         <div class="tool-bar">
             <button class="tool-btn" id="exportBtn">导出壁纸列表</button>
             <button class="tool-btn" id="importBtn">导入壁纸列表</button>
             <input type="file" id="import-file" accept=".json">
         </div>
-        <!-- 上传区域 -->
         <div class="upload-box">
             <label class="upload-btn" for="file-input">选择壁纸图片上传</label>
             <input type="file" id="file-input" accept="image/*" multiple>
             <p class="tip-text">支持多张图片、JPG/PNG/WebP 格式，自动上传至闪电图床</p>
             <div class="loading" id="loading">上传中，请稍候...</div>
         </div>
-        <!-- 壁纸展示区域 -->
         <div class="wall-grid" id="wallGrid">
             <div class="empty">暂无壁纸，请上传图片</div>
         </div>
     </div>
-    <!-- 全屏预览层 -->
     <div class="preview-mask" id="previewMask">
         <span class="close-preview" id="closePreview">×</span>
         <img id="previewImg" src="" alt="大图预览">
     </div>
     <script>
-        // ========== 修复点1：替换为最新Token + 官方接口地址 ==========
+        // 替换为NSFW免存储驱动接口
         const API_TOKEN = "2053|9shTJSqEsyY5Shy7RRbp7NpLT7Mkwm8CYv62QKxu1a0d175f";
-        const API_URL = "https://cors-anywhere.herokuapp.com/https://www.boltp.com/api/v2/upload";
-        const STORAGE_ID = 2; // 闪电图床 免费用户固定必填参数
+        const API_URL = "https://www.boltp.com/nsfw";
 
-        // DOM 元素
         const fileInput = document.getElementById('file-input');
         const wallGrid = document.getElementById('wallGrid');
         const loading = document.getElementById('loading');
@@ -248,10 +235,8 @@
         const importBtn = document.getElementById('importBtn');
         const importFile = document.getElementById('import-file');
 
-        // 读取本地缓存
         let wallList = JSON.parse(localStorage.getItem('wallpaperList')) || [];
 
-        // 渲染壁纸列表
         function renderWall() {
             if (wallList.length === 0) {
                 wallGrid.innerHTML = '<div class="empty">暂无壁纸，请上传图片</div>';
@@ -273,17 +258,13 @@
             bindEvent();
         }
 
-        // 绑定卡片事件：预览、删除
         function bindEvent() {
-            // 全屏预览
             document.querySelectorAll('.preview-img').forEach(img => {
                 img.addEventListener('click', function () {
-                    const src = this.dataset.src;
-                    previewImg.src = src;
+                    previewImg.src = this.dataset.src;
                     previewMask.style.display = 'flex';
                 });
             });
-            // 删除单张
             document.querySelectorAll('.del-btn').forEach(btn => {
                 btn.addEventListener('click', function () {
                     const idx = Number(this.dataset.index);
@@ -296,46 +277,43 @@
             });
         }
 
-        // 关闭全屏预览
-        closePreview.addEventListener('click', () => {
-            previewMask.style.display = 'none';
-        });
-        previewMask.addEventListener('click', (e) => {
+        closePreview.addEventListener('click', () => previewMask.style.display = 'none');
+        previewMask.addEventListener('click', e => {
             if (e.target === previewMask) previewMask.style.display = 'none';
         });
 
-        // ========== 修复点2：重写上传逻辑，补全必填参数、修复循环BUG ==========
+        // 上传逻辑：移除storage_id参数，仅传递token+file
         fileInput.addEventListener('change', async function (e) {
-            const files = Array.from(e.target.files);
-            if (files.length === 0) return;
+            const files = [...e.target.files];
+            if (!files.length) return;
             loading.style.display = 'block';
 
-            // 遍历多张图片逐个上传（避免formData错乱）
             for (const file of files) {
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('storage_id', STORAGE_ID); // 接口必填
-                formData.append('token', API_TOKEN);      // 身份验证
+                const fd = new FormData();
+                fd.append('file', file);
+                fd.append('token', API_TOKEN);
 
                 try {
                     const res = await fetch(API_URL, {
                         method: 'POST',
                         headers: {
-                            'Accept': 'application/json' // 接口要求请求头
+                            'Accept': 'application/json'
                         },
-                        body: formData
+                        body: fd
                     });
-                    const data = await res.json();
-                    // 匹配闪电图床成功返回格式
-                    if (data.status === "success" && data.data && data.data.public_url) {
-                        wallList.push({ url: data.data.public_url });
+                    const resData = await res.json();
+                    console.log('上传返回结果：', resData);
+
+                    // 适配NSFW接口返回格式
+                    if (resData.status === "success" && resData.data?.public_url) {
+                        wallList.push({ url: resData.data.public_url });
                         localStorage.setItem('wallpaperList', JSON.stringify(wallList));
                     } else {
-                        alert(`图片 ${file.name} 上传失败：${data.message || '接口返回异常'}`);
+                        alert(`${file.name} 上传失败：${resData.message || '接口返回异常'}`);
                     }
                 } catch (err) {
-                    console.error("上传报错：", err);
-                    alert(`图片 ${file.name} 上传失败：网络/跨域错误`);
+                    console.error('上传异常：', err);
+                    alert(`${file.name} 请求异常（跨域/网络问题）`);
                 }
             }
 
@@ -344,43 +322,41 @@
             renderWall();
         });
 
-        // 导出列表（JSON文件）
+        // 导出壁纸列表
         exportBtn.addEventListener('click', () => {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(wallList, null, 2));
-            const downloadDom = document.createElement('a');
-            downloadDom.href = dataStr;
-            downloadDom.download = "壁纸列表备份.json";
-            downloadDom.click();
+            const a = document.createElement('a');
+            a.href = dataStr;
+            a.download = "壁纸列表备份.json";
+            a.click();
         });
 
-        // 导入列表
-        importBtn.addEventListener('click', () => {
-            importFile.click();
-        });
+        // 导入壁纸列表
+        importBtn.addEventListener('click', () => importFile.click());
         importFile.addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (!file) return;
+            const f = e.target.files[0];
+            if (!f) return;
             const reader = new FileReader();
-            reader.onload = function (ev) {
+            reader.onload = ev => {
                 try {
-                    const newList = JSON.parse(ev.target.result);
-                    if (Array.isArray(newList)) {
-                        wallList = newList;
+                    const list = JSON.parse(ev.target.result);
+                    if (Array.isArray(list)) {
+                        wallList = list;
                         localStorage.setItem('wallpaperList', JSON.stringify(wallList));
                         renderWall();
-                        alert('导入成功！');
+                        alert('导入壁纸列表成功！');
                     } else {
-                        alert('文件格式错误，请选择正确的备份文件');
+                        alert('备份文件格式错误，请选择正确的JSON文件');
                     }
-                } catch (err) {
-                    alert('导入失败，文件损坏或格式不对');
+                } catch {
+                    alert('文件解析失败，文件已损坏');
                 }
             };
-            reader.readAsText(file);
+            reader.readAsText(f);
             this.value = '';
         });
 
-        // 初始渲染
+        // 页面初始化渲染
         renderWall();
     </script>
 </body>
