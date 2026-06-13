@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>私人科技壁纸库 | 闪电图床对接</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+        }
+        body {
+            background: #050816;
+            background-image: radial-gradient(circle at 50% 20%, #101730 0%, #050816 70%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        /* 头部标题 */
+        header {
+            text-align: center;
+            padding: 2rem 0;
+            border-bottom: 1px solid rgba(0, 220, 255, 0.2);
+            margin-bottom: 2rem;
+        }
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #00d8ff, #8b5cf6);
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: 6px;
+        }
+        .desc {
+            color: rgba(255,255,255,0.5);
+            margin-top: 0.8rem;
+        }
+        /* 功能按钮栏 */
+        .tool-bar {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            gap: 12px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .tool-btn {
+            padding: 8px 20px;
+            background: linear-gradient(90deg, #224488, #5522aa);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .tool-btn:hover {
+            box-shadow: 0 0 12px rgba(0, 216, 255, 0.4);
+        }
+        #import-file {
+            display: none;
+        }
+        /* 上传区域 科技风毛玻璃 */
+        .upload-box {
+            background: rgba(25, 35, 60, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 220, 255, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            transition: 0.3s;
+        }
+        .upload-box:hover {
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.25);
+        }
+        #file-input {
+            display: none;
+        }
+        .upload-btn {
+            display: inline-block;
+            padding: 12px 32px;
+            background: linear-gradient(90deg, #00a8ff, #7b2cbf);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .upload-btn:hover {
+            box-shadow: 0 0 15px #00d8ff;
+        }
+        .tip-text {
+            margin-top: 1rem;
+            color: rgba(255,255,255,0.4);
+            font-size: 0.9rem;
+        }
+        /* 加载提示 */
+        .loading {
+            color: #00d8ff;
+            margin-top: 1rem;
+            display: none;
+        }
+        /* 壁纸网格 */
+        .wall-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 24px;
+        }
+        /* 壁纸卡片 */
+        .wall-card {
+            background: rgba(25, 35, 60, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 220, 255, 0.25);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .wall-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 220, 255, 0.6);
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.35);
+        }
+        .wall-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+        }
+        .card-action {
+            padding: 15px;
+            text-align: center;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .down-btn, .del-btn {
+            padding: 7px 16px;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .down-btn {
+            background: linear-gradient(90deg, #0099e5, #6c2bd9);
+        }
+        .del-btn {
+            background: linear-gradient(90deg, #c53030, #922b2b);
+        }
+        .down-btn:hover {
+            box-shadow: 0 0 10px #00d8ff;
+        }
+        .del-btn:hover {
+            box-shadow: 0 0 10px #ff4444;
+        }
+        .empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: rgba(255,255,255,0.3);
+            padding: 3rem 0;
+        }
+        /* 全屏预览遮罩 */
+        .preview-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.92);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .preview-mask img {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+        }
+        .close-preview {
+            position: absolute;
+            top: 25px;
+            right: 35px;
+            font-size: 2.2rem;
+            color: #fff;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: 0.2s;
+        }
+        .close-preview:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>私人科技壁纸库</h1>
+            <p class="desc">对接闪电图床 | 上传 · 预览 · 下载 · 管理</p>
+        </header>
+
+        <!-- 导入导出工具栏 -->
+        <div class="tool-bar">
+            <button class="tool-btn" id="exportBtn">导出壁纸列表</button>
+            <button class="tool-btn" id="importBtn">导入壁纸列表</button>
+            <input type="file" id="import-file" accept=".json">
+        </div>
+
+        <!-- 上传区域 -->
+        <div class="upload-box">
+            <label class="upload-btn" for="file-input">选择壁纸图片上传</label>
+            <input type="file" id="file-input" accept="image/*" multiple>
+            <p class="tip-text">支持多张图片、JPG/PNG/WebP 格式，自动上传至闪电图床</p>
+            <div class="loading" id="loading">上传中，请稍候...</div>
+        </div>
+
+        <!-- 壁纸展示区域 -->
+        <div class="wall-grid" id="wallGrid">
+            <div class="empty">暂无壁纸，请上传图片</div>
+        </div>
+    </div>
+
+    <!-- 全屏预览层 -->
+    <div class="preview-mask" id="previewMask">
+        <span class="close-preview" id="closePreview">×</span>
+        <img id="previewImg" src="" alt="大图预览">
+    </div>
+
+    <script>
+        // 闪电图床配置
+        const API_TOKEN = "2047|SAZoDMXDbz0s29ywGSFBw86BiVW6fE9UE9G9TBHR95ed6dba";
+        const API_URL = "https://img.12306.la/api/upload";
+
+        // DOM 元素
+        const fileInput = document.getElementById('file-input');
+        const wallGrid = document.getElementById('wallGrid');
+        const loading = document.getElementById('loading');
+        const previewMask = document.getElementById('previewMask');
+        const previewImg = document.getElementById('previewImg');
+        const closePreview = document.getElementById('closePreview');
+        const exportBtn = document.getElementById('exportBtn');
+        const importBtn = document.getElementById('importBtn');
+        const importFile = document.getElementById('import-file');
+
+        // 读取本地缓存
+        let wallList = JSON.parse(localStorage.getItem('wallpaperList')) || [];
+
+        // 渲染壁纸列表
+        function renderWall() {
+            if (wallList.length === 0) {
+                wallGrid.innerHTML = '<div class="empty">暂无壁纸，请上传图片</div>';
+                return;
+            }
+            let html = '';
+            wallList.forEach((item, index) => {
+                html += `
+                <div class="wall-card" data-index="${index}">
+                    <img src="${item.url}" alt="壁纸" class="preview-img" data-src="${item.url}">
+                    <div class="card-action">
+                        <a href="${item.url}" class="down-btn" download>下载</a>
+                        <button class="del-btn" data-index="${index}">删除</button>
+                    </div>
+                </div>
+                `;
+            });
+            wallGrid.innerHTML = html;
+            bindEvent();
+        }
+
+        // 绑定卡片事件：预览、删除
+        function bindEvent() {
+            // 全屏预览
+            document.querySelectorAll('.preview-img').forEach(img => {
+                img.addEventListener('click', function () {
+                    const src = this.dataset.src;
+                    previewImg.src = src;
+                    previewMask.style.display = 'flex';
+                });
+            });
+            // 删除单张
+            document.querySelectorAll('.del-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const idx = Number(this.dataset.index);
+                    if (confirm('确定要删除这张壁纸吗？')) {
+                        wallList.splice(idx, 1);
+                        localStorage.setItem('wallpaperList', JSON.stringify(wallList));
+                        renderWall();
+                    }
+                });
+            });
+        }
+
+        // 关闭全屏预览
+        closePreview.addEventListener('click', () => {
+            previewMask.style.display = 'none';
+        });
+        previewMask.addEventListener('click', (e) => {
+            if (e.target === previewMask) previewMask.style.display = 'none';
+        });
+
+        // 上传图片逻辑
+        fileInput.addEventListener('change', async function (e) {
+            const files = e.target.files;
+            if (files.length === 0) return;
+            loading.style.display = 'block';
+            const formData = new FormData();
+            formData.append('token', API_TOKEN);
+
+            for (let file of files) {
+                formData.append('file', file);
+                try {
+                    const res = await fetch(API_URL, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+                    if (data.code === 200 && data.data && data.data.url) {
+                        wallList.push({ url: data.data.url });
+                        localStorage.setItem('wallpaperList', JSON.stringify(wallList));
+                    }
+                } catch (err) {
+                    alert(`图片 ${file.name} 上传失败`);
+                }
+            }
+            loading.style.display = 'none';
+            fileInput.value = '';
+            renderWall();
+        });
+
+        // 导出列表（JSON文件）
+        exportBtn.addEventListener('click', () => {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(wallList, null, 2));
+            const downloadDom = document.createElement('a');
+            downloadDom.href = dataStr;
+            downloadDom.download = "壁纸列表备份.json";
+            downloadDom.click();
+        });
+
+        // 导入列表
+        importBtn.addEventListener('click', () => {
+            importFile.click();
+        });
+        importFile.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+                try {
+                    const newList = JSON.parse(ev.target.result);
+                    if (Array.isArray(newList)) {
+                        wallList = newList;
+                        localStorage.setItem('wallpaperList', JSON.stringify(wallList));
+                        renderWall();
+                        alert('导入成功！');
+                    } else {
+                        alert('文件格式错误，请选择正确的备份文件');
+                    }
+                } catch (err) {
+                    alert('导入失败，文件损坏或格式不对');
+                }
+            };
+            reader.readAsText(file);
+            this.value = '';
+        });
+
+        // 初始渲染
+        renderWall();
+    </script>
+</body>
+</html>
