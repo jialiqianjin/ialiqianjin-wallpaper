@@ -208,14 +208,12 @@
             <h1>私人科技壁纸库</h1>
             <p class="desc">对接闪电图床 | 上传 · 预览 · 下载 · 管理</p>
         </header>
-
         <!-- 导入导出工具栏 -->
         <div class="tool-bar">
             <button class="tool-btn" id="exportBtn">导出壁纸列表</button>
             <button class="tool-btn" id="importBtn">导入壁纸列表</button>
             <input type="file" id="import-file" accept=".json">
         </div>
-
         <!-- 上传区域 -->
         <div class="upload-box">
             <label class="upload-btn" for="file-input">选择壁纸图片上传</label>
@@ -223,23 +221,21 @@
             <p class="tip-text">支持多张图片、JPG/PNG/WebP 格式，自动上传至闪电图床</p>
             <div class="loading" id="loading">上传中，请稍候...</div>
         </div>
-
         <!-- 壁纸展示区域 -->
         <div class="wall-grid" id="wallGrid">
             <div class="empty">暂无壁纸，请上传图片</div>
         </div>
     </div>
-
     <!-- 全屏预览层 -->
     <div class="preview-mask" id="previewMask">
         <span class="close-preview" id="closePreview">×</span>
         <img id="previewImg" src="" alt="大图预览">
     </div>
-
     <script>
-        // 闪电图床配置
-        const API_TOKEN = "2047|SAZoDMXDbz0s29ywGSFBw86BiVW6fE9UE9G9TBHR95ed6dba";
-        const API_URL = "https://img.12306.la/api/upload";
+        // ========== 修复点1：替换为最新Token + 官方接口地址 ==========
+        const API_TOKEN = "2053|9shTJSqEsyY5Shy7RRbp7NpLT7Mkwm8CYv62QKxu1a0d175f";
+        const API_URL = "https://www.boltp.com/api/v2/upload";
+        const STORAGE_ID = 2; // 闪电图床 免费用户固定必填参数
 
         // DOM 元素
         const fileInput = document.getElementById('file-input');
@@ -308,30 +304,41 @@
             if (e.target === previewMask) previewMask.style.display = 'none';
         });
 
-        // 上传图片逻辑
+        // ========== 修复点2：重写上传逻辑，补全必填参数、修复循环BUG ==========
         fileInput.addEventListener('change', async function (e) {
-            const files = e.target.files;
+            const files = Array.from(e.target.files);
             if (files.length === 0) return;
             loading.style.display = 'block';
-            const formData = new FormData();
-            formData.append('token', API_TOKEN);
 
-            for (let file of files) {
+            // 遍历多张图片逐个上传（避免formData错乱）
+            for (const file of files) {
+                const formData = new FormData();
                 formData.append('file', file);
+                formData.append('storage_id', STORAGE_ID); // 接口必填
+                formData.append('token', API_TOKEN);      // 身份验证
+
                 try {
                     const res = await fetch(API_URL, {
                         method: 'POST',
+                        headers: {
+                            'Accept': 'application/json' // 接口要求请求头
+                        },
                         body: formData
                     });
                     const data = await res.json();
-                    if (data.code === 200 && data.data && data.data.url) {
-                        wallList.push({ url: data.data.url });
+                    // 匹配闪电图床成功返回格式
+                    if (data.status === "success" && data.data && data.data.public_url) {
+                        wallList.push({ url: data.data.public_url });
                         localStorage.setItem('wallpaperList', JSON.stringify(wallList));
+                    } else {
+                        alert(`图片 ${file.name} 上传失败：${data.message || '接口返回异常'}`);
                     }
                 } catch (err) {
-                    alert(`图片 ${file.name} 上传失败`);
+                    console.error("上传报错：", err);
+                    alert(`图片 ${file.name} 上传失败：网络/跨域错误`);
                 }
             }
+
             loading.style.display = 'none';
             fileInput.value = '';
             renderWall();
