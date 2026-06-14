@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>私人科技壁纸库 | 闪电图床NSFW接口版</title>
+    <title>私人科技壁纸库 | GitHub 自建图床</title>
     <style>
         * {
             margin: 0;
@@ -199,7 +199,7 @@
     <div class="container">
         <header>
             <h1>私人科技壁纸库</h1>
-            <p class="desc">对接闪电图床 | 上传 · 预览 · 下载 · 管理</p>
+            <p class="desc">GitHub 自建图床 | 上传 · 预览 · 下载 · 管理</p>
         </header>
         <div class="tool-bar">
             <button class="tool-btn" id="exportBtn">导出壁纸列表</button>
@@ -209,7 +209,7 @@
         <div class="upload-box">
             <label class="upload-btn" for="file-input">选择壁纸图片上传</label>
             <input type="file" id="file-input" accept="image/*" multiple>
-            <p class="tip-text">支持多张图片、JPG/PNG/WebP 格式，自动上传至闪电图床</p>
+            <p class="tip-text">支持多张图片、JPG/PNG/WebP，自动上传至仓库 images 目录</p>
             <div class="loading" id="loading">上传中，请稍候...</div>
         </div>
         <div class="wall-grid" id="wallGrid">
@@ -220,11 +220,14 @@
         <span class="close-preview" id="closePreview">×</span>
         <img id="previewImg" src="" alt="大图预览">
     </div>
-    <script>
-        // 替换为NSFW免存储驱动接口
-        const API_TOKEN = "2053|9shTJSqEsyY5Shy7RRbp7NpLT7Mkwm8CYv62QKxu1a0d175f";
-        const API_URL = "https://www.boltp.com/nsfw";
 
+    <script>
+        const GITHUB_USER = "jialiqianjin";
+        const GITHUB_REPO = "ialiqianjin-wallpaper";
+        const GITHUB_BRANCH = "main";
+        const GITHUB_TOKEN = "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";
+
+        const API_BASE = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/images`;
         const fileInput = document.getElementById('file-input');
         const wallGrid = document.getElementById('wallGrid');
         const loading = document.getElementById('loading');
@@ -236,6 +239,46 @@
         const importFile = document.getElementById('import-file');
 
         let wallList = JSON.parse(localStorage.getItem('wallpaperList')) || [];
+
+        function getFileName(originName) {
+            const ext = originName.split('.').pop();
+            const time = new Date().getTime();
+            return `${time}.${ext}`;
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = err => reject(err);
+            });
+        }
+
+        async function uploadImage(file) {
+            const fileName = getFileName(file.name);
+            const base64 = await fileToBase64(file);
+            const url = `${API_BASE}/${fileName}`;
+
+            const res = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `upload image: ${fileName}`,
+                    content: base64,
+                    branch: GITHUB_BRANCH
+                })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || '上传失败');
+
+            const cdnUrl = `https://${GITHUB_USER}.github.io/${GITHUB_REPO}/images/${fileName}`;
+            return cdnUrl;
+        }
 
         function renderWall() {
             if (wallList.length === 0) {
@@ -282,38 +325,18 @@
             if (e.target === previewMask) previewMask.style.display = 'none';
         });
 
-        // 上传逻辑：移除storage_id参数，仅传递token+file
         fileInput.addEventListener('change', async function (e) {
             const files = [...e.target.files];
             if (!files.length) return;
             loading.style.display = 'block';
 
             for (const file of files) {
-                const fd = new FormData();
-                fd.append('file', file);
-                fd.append('token', API_TOKEN);
-
                 try {
-                    const res = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json'
-                        },
-                        body: fd
-                    });
-                    const resData = await res.json();
-                    console.log('上传返回结果：', resData);
-
-                    // 适配NSFW接口返回格式
-                    if (resData.status === "success" && resData.data?.public_url) {
-                        wallList.push({ url: resData.data.public_url });
-                        localStorage.setItem('wallpaperList', JSON.stringify(wallList));
-                    } else {
-                        alert(`${file.name} 上传失败：${resData.message || '接口返回异常'}`);
-                    }
+                    const imgUrl = await uploadImage(file);
+                    wallList.push({ url: imgUrl });
+                    localStorage.setItem('wallpaperList', JSON.stringify(wallList));
                 } catch (err) {
-                    console.error('上传异常：', err);
-                    alert(`${file.name} 请求异常（跨域/网络问题）`);
+                    alert(`${file.name} 上传失败：${err.message}`);
                 }
             }
 
@@ -322,7 +345,6 @@
             renderWall();
         });
 
-        // 导出壁纸列表
         exportBtn.addEventListener('click', () => {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(wallList, null, 2));
             const a = document.createElement('a');
@@ -331,7 +353,6 @@
             a.click();
         });
 
-        // 导入壁纸列表
         importBtn.addEventListener('click', () => importFile.click());
         importFile.addEventListener('change', function (e) {
             const f = e.target.files[0];
@@ -344,19 +365,18 @@
                         wallList = list;
                         localStorage.setItem('wallpaperList', JSON.stringify(wallList));
                         renderWall();
-                        alert('导入壁纸列表成功！');
+                        alert('导入成功');
                     } else {
-                        alert('备份文件格式错误，请选择正确的JSON文件');
+                        alert('文件格式错误');
                     }
                 } catch {
-                    alert('文件解析失败，文件已损坏');
+                    alert('导入失败');
                 }
             };
             reader.readAsText(f);
             this.value = '';
         });
 
-        // 页面初始化渲染
         renderWall();
     </script>
 </body>
