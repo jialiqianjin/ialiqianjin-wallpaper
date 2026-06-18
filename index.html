@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>私人科技壁纸库 | GitHub 自建图床</title>
+    <title>私人壁纸库（纯链接版）</title>
     <style>
         * {
             margin: 0;
@@ -36,7 +36,7 @@
             letter-spacing: 6px;
         }
         .desc {
-            color: rgba(255,255,255,0.5);
+            color: rgba(255,255,0.5);
             margin-top: 0.8rem;
         }
         .tool-bar {
@@ -63,7 +63,7 @@
         #import-file {
             display: none;
         }
-        .upload-box {
+        .add-link-box {
             background: rgba(25, 35, 60, 0.5);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(0, 220, 255, 0.3);
@@ -71,35 +71,27 @@
             padding: 2rem;
             text-align: center;
             margin-bottom: 2.5rem;
-            transition: 0.3s;
         }
-        .upload-box:hover {
-            box-shadow: 0 0 30px rgba(0, 210, 255, 0.25);
-        }
-        #file-input {
-            display: none;
-        }
-        .upload-btn {
-            display: inline-block;
-            padding: 12px 32px;
-            background: linear-gradient(90deg, #00a8ff, #7b2cbf);
+        #linkInput {
+            width: 100%;
+            max-width: 800px;
+            padding: 12px 16px;
             border-radius: 8px;
+            border: 1px solid #00a8ff60;
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+        #addLinkBtn {
+            margin-top: 12px;
+            padding: 10px 28px;
+            background: linear-gradient(90deg, #00a8ff, #7b2cbf);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
             cursor: pointer;
             font-size: 1rem;
-            transition: 0.2s;
-        }
-        .upload-btn:hover {
-            box-shadow: 0 0 15px #00d8ff;
-        }
-        .tip-text {
-            margin-top: 1rem;
-            color: rgba(255,255,255,0.4);
-            font-size: 0.9rem;
-        }
-        .loading {
-            color: #00d8ff;
-            margin-top: 1rem;
-            display: none;
         }
         .wall-grid {
             display: grid;
@@ -110,7 +102,7 @@
             background: rgba(25, 35, 60, 0.6);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(0, 220, 255, 0.25);
-            border-radius: 12px;
+            border-radius 12px;
             overflow: hidden;
             transition: all 0.3s ease;
         }
@@ -150,16 +142,10 @@
         .del-btn {
             background: linear-gradient(90deg, #c53030, #922b2b);
         }
-        .down-btn:hover {
-            box-shadow: 0 0 10px #00d8ff;
-        }
-        .del-btn:hover {
-            box-shadow: 0 0 10px #ff4444;
-        }
         .empty {
             grid-column: 1 / -1;
             text-align: center;
-            color: rgba(255,255,255,0.3);
+            color: rgba(255,255,0.3);
             padding: 3rem 0;
         }
         .preview-mask {
@@ -188,101 +174,76 @@
             color: #fff;
             cursor: pointer;
             opacity: 0.7;
-            transition: 0.2s;
-        }
-        .close-preview:hover {
-            opacity: 1;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>私人科技壁纸库</h1>
-            <p class="desc">GitHub 自建图床 | 上传 · 预览 · 下载 · 管理</p>
+            <h1>私人壁纸库（纯链接版）</h1>
+            <p class="desc">粘贴图片链接 / JSON导入 / 本地保存</p>
         </header>
         <div class="tool-bar">
-            <button class="tool-btn" id="exportBtn">导出壁纸列表</button>
-            <button class="tool-btn" id="importBtn">导入壁纸列表</button>
+            <button class="tool-btn" id="exportBtn">导出壁纸列表JSON</button>
+            <button class="tool-btn" id="importBtn">导入壁纸列表JSON</button>
             <input type="file" id="import-file" accept=".json">
         </div>
-        <div class="upload-box">
-            <label class="upload-btn" for="file-input">选择壁纸图片上传</label>
-            <input type="file" id="file-input" accept="image/*" multiple>
-            <p class="tip-text">支持多张图片、JPG/PNG/WebP，自动上传至仓库 images 目录</p>
-            <div class="loading" id="loading">上传中，请稍候...</div>
+
+        <!-- 手动粘贴单张图片链接 -->
+        <div class="add-link-box">
+            <input id="linkInput" placeholder="粘贴图片网络链接，例如 https://xxx.jpg">
+            <br>
+            <button id="addLinkBtn">添加该壁纸</button>
         </div>
+
         <div class="wall-grid" id="wallGrid">
-            <div class="empty">暂无壁纸，请上传图片</div>
+            <div class="empty">暂无壁纸，请粘贴图片链接或导入JSON文件</div>
         </div>
     </div>
+
     <div class="preview-mask" id="previewMask">
         <span class="close-preview" id="closePreview">×</span>
         <img id="previewImg" src="" alt="大图预览">
     </div>
 
     <script>
-        const GITHUB_USER = "jialiqianjin";
-        const GITHUB_REPO = "ialiqianjin-wallpaper";
-        const GITHUB_BRANCH = "main";
-        const GITHUB_TOKEN = "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";
-
-        const API_BASE = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/images`;
-        const fileInput = document.getElementById('file-input');
         const wallGrid = document.getElementById('wallGrid');
-        const loading = document.getElementById('loading');
         const previewMask = document.getElementById('previewMask');
         const previewImg = document.getElementById('previewImg');
         const closePreview = document.getElementById('closePreview');
         const exportBtn = document.getElementById('exportBtn');
         const importBtn = document.getElementById('importBtn');
         const importFile = document.getElementById('import-file');
+        const linkInput = document.getElementById('linkInput');
+        const addLinkBtn = document.getElementById('addLink');
 
+        // 本地存储壁纸链接数组
         let wallList = JSON.parse(localStorage.getItem('wallpaperList')) || [];
 
-        function getFileName(originName) {
-            const ext = originName.split('.').pop();
-            const time = new Date().getTime();
-            return `${time}.${ext}`;
-        }
+        // 添加单条图片链接
+        addLinkBtn.addEventListener('click', () => {
+            const url = linkInput.value.trim();
+            if (!url) {
+                alert("请输入图片链接");
+                return;
+            }
+            // 简单校验图片后缀
+            const ext = url.split('.').pop().toLowerCase();
+            if (!['jpg','jpeg','png','gif','webp'].includes(ext)) {
+                alert("链接不是图片格式，请检查");
+                return;
+            }
+            wallList.push({url});
+            localStorage.setItem('wallpaperList', JSON.stringify(wallList));
+            linkInput.value = "";
+            renderWall();
+            alert("添加成功");
+        });
 
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result.split(',')[1]);
-                reader.onerror = err => reject(err);
-            });
-        }
-
-        async function uploadImage(file) {
-            const fileName = getFileName(file.name);
-            const base64 = await fileToBase64(file);
-            const url = `${API_BASE}/${fileName}`;
-
-            const res = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${GITHUB_TOKEN}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: `upload image: ${fileName}`,
-                    content: base64,
-                    branch: GITHUB_BRANCH
-                })
-            });
-
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || '上传失败');
-
-            const cdnUrl = `https://${GITHUB_USER}.github.io/${GITHUB_REPO}/images/${fileName}`;
-            return cdnUrl;
-        }
-
+        // 渲染全部壁纸卡片
         function renderWall() {
             if (wallList.length === 0) {
-                wallGrid.innerHTML = '<div class="empty">暂无壁纸，请上传图片</div>';
+                wallGrid.innerHTML = '<div class="empty">暂无壁纸，请粘贴图片链接或导入JSON文件</div>';
                 return;
             }
             let html = '';
@@ -291,92 +252,76 @@
                 <div class="wall-card" data-index="${index}">
                     <img src="${item.url}" alt="壁纸" class="preview-img" data-src="${item.url}">
                     <div class="card-action">
-                        <a href="${item.url}" class="down-btn" download>下载</a>
+                        <a href="${item.url}" target="_blank" class="down-btn">下载原图</a>
                         <button class="del-btn" data-index="${index}">删除</button>
                     </div>
                 </div>
                 `;
             });
             wallGrid.innerHTML = html;
-            bindEvent();
+            bindCardEvent();
         }
 
-        function bindEvent() {
+        // 绑定预览、删除事件
+        function bindCardEvent() {
             document.querySelectorAll('.preview-img').forEach(img => {
-                img.addEventListener('click', function () {
-                    previewImg.src = this.dataset.src;
+                img.onclick = () => {
+                    previewImg.src = img.dataset.src;
                     previewMask.style.display = 'flex';
-                });
+                }
             });
             document.querySelectorAll('.del-btn').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    const idx = Number(this.dataset.index);
-                    if (confirm('确定要删除这张壁纸吗？')) {
-                        wallList.splice(idx, 1);
+                btn.onclick = () => {
+                    const idx = Number(btn.dataset.index);
+                    if (confirm("确定删除这张壁纸？仅删除本地记录，不会删除原图链接")) {
+                        wallList.splice(idx,1);
                         localStorage.setItem('wallpaperList', JSON.stringify(wallList));
                         renderWall();
                     }
-                });
+                }
             });
         }
 
-        closePreview.addEventListener('click', () => previewMask.style.display = 'none');
-        previewMask.addEventListener('click', e => {
+        // 关闭大图预览
+        closePreview.onclick = () => previewMask.style.display = 'none';
+        previewMask.onclick = (e) => {
             if (e.target === previewMask) previewMask.style.display = 'none';
-        });
+        }
 
-        fileInput.addEventListener('change', async function (e) {
-            const files = [...e.target.files];
-            if (!files.length) return;
-            loading.style.display = 'block';
-
-            for (const file of files) {
-                try {
-                    const imgUrl = await uploadImage(file);
-                    wallList.push({ url: imgUrl });
-                    localStorage.setItem('wallpaperList', JSON.stringify(wallList));
-                } catch (err) {
-                    alert(`${file.name} 上传失败：${err.message}`);
-                }
-            }
-
-            loading.style.display = 'none';
-            fileInput.value = '';
-            renderWall();
-        });
-
-        exportBtn.addEventListener('click', () => {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(wallList, null, 2));
+        // 导出JSON备份
+        exportBtn.onclick = () => {
+            const jsonStr = JSON.stringify(wallList, null, 2);
+            const blob = new Blob([jsonStr], {type:"application/json"});
             const a = document.createElement('a');
-            a.href = dataStr;
-            a.download = "壁纸列表备份.json";
+            a.href = URL.createObject(blob);
+            a.download = "壁纸备份.json";
             a.click();
-        });
+            URL.revokeObjectURL(a.href);
+        }
 
-        importBtn.addEventListener('click', () => importFile.click());
-        importFile.addEventListener('change', function (e) {
-            const f = e.target.files[0];
-            if (!f) return;
+        // 导入JSON文件
+        importBtn.onclick = () => importFile.click();
+        importFile.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
             const reader = new FileReader();
             reader.onload = ev => {
                 try {
-                    const list = JSON.parse(ev.target.result);
-                    if (Array.isArray(list)) {
-                        wallList = list;
-                        localStorage.setItem('wallpaperList', JSON.stringify(wallList));
-                        renderWall();
-                        alert('导入成功');
-                    } else {
-                        alert('文件格式错误');
-                    }
+                    const data = JSON.parse(ev.target.result);
+                    if (!Array.isArray(data)) throw Error("格式错误");
+                    wallList = data;
+                    localStorage.setItem('wallpaperList', JSON.stringify(wallList));
+                    renderWall();
+                    alert("导入成功");
                 } catch {
-                    alert('导入失败');
+                    alert("JSON文件损坏/格式不对");
                 }
-            };
-            reader.readAsText(f);
-            this.value = '';
-        });
+            }
+            reader.readAsText(file);
+            importFile.value = "";
+        }
 
+        // 页面初始化渲染
         renderWall();
     </script>
 </body>
