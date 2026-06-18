@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>私人壁纸库（纯链接版）</title>
+    <title>固定壁纸库（所有设备通用）</title>
     <style>
         * {
             margin: 0;
@@ -58,7 +58,7 @@
             transition: 0.2s;
         }
         .tool-btn:hover {
-            box-shadow: 0 0 12px rgba(0, 216, 255, 0.4);
+            box-shadow: 0 0 12px rgba(0, 216, 0.4);
         }
         #import-file {
             display: none;
@@ -83,10 +83,10 @@
             font-size: 14px;
             outline: none;
         }
-        #addLinkBtn {
+        #addTempBtn {
             margin-top: 12px;
             padding: 10px 28px;
-            background: linear-gradient(90deg, #00a8ff, #7b2cbf);
+            background: linear-gradient(90deg, #777, #444);
             border: none;
             border-radius: 8px;
             color: #fff;
@@ -126,7 +126,7 @@
             justify-content: center;
             flex-wrap: wrap;
         }
-        .down-btn, .del-btn {
+        .down-btn {
             padding: 7px 16px;
             color: #fff;
             text-decoration: none;
@@ -135,12 +135,7 @@
             transition: 0.2s;
             border: none;
             cursor: pointer;
-        }
-        .down-btn {
             background: linear-gradient(90deg, #0099e5, #6c2bd9);
-        }
-        .del-btn {
-            background: linear-gradient(90deg, #c53030, #922b2b);
         }
         .empty {
             grid-column: 1 / -1;
@@ -180,23 +175,23 @@
 <body>
     <div class="container">
         <header>
-            <h1>私人壁纸库（纯链接版）</h1>
-            <p class="desc">粘贴图片链接 / JSON导入 / 本地保存</p>
+            <h1>固定壁纸库（所有设备通用）</h1>
+            <p class="desc">写死代码永久展示 | 临时添加仅当前浏览器生效</p>
         </header>
         <div class="tool-bar">
-            <button class="tool-btn" id="exportBtn">导出壁纸列表JSON</button>
-            <button class="tool-btn" id="importBtn">导入壁纸列表JSON</button>
+            <button class="tool-btn" id="exportBtn">导出全部链接JSON</button>
             <input type="file" id="import-file" accept=".json">
         </div>
 
         <div class="add-link-box">
-            <input id="linkInput" placeholder="粘贴图片网络链接，例如 https://xxx.jpg">
+            <input id="linkInput" placeholder="临时添加图片（换设备消失，永久需写进代码）">
             <br>
-            <button id="addLinkBtn">添加该壁纸</button>
+            <button id="addTempBtn">临时添加（本地缓存）</button>
+            <p style="color:#aaa;margin-top:8px;font-size:13px;">⚠️ 想要换设备也显示，必须把链接加到下方JS的fixedImages数组，重新上传页面</p>
         </div>
 
         <div class="wall-grid" id="wallGrid">
-            <div class="empty">暂无壁纸，请粘贴图片链接或导入JSON文件</div>
+            <div class="empty">加载中...</div>
         </div>
     </div>
 
@@ -206,115 +201,95 @@
     </div>
 
     <script>
+        // ===================== 永久图片（在这里新增链接，所有设备都能看到）=====================
+        const fixedImages = [
+            "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVse9qM3ZwqHjkQCkkZS2xCvMavSz70QACFiMAAoLBoVXyysCgPKPgXTwE.jpg",
+            "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVsgRqM3jGTgnr3syb7ztuclcHt35fSgACMCMAAoLBoVXG6YvfK6qc6TwE.png",
+            "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVsjFqM30AAXyA1uSlDvi_HxgRK_BoRM0AAnQjAAKCwaFVfapo5nroNFs8BA.png"
+        ];
+        // ======================================================================================
+
         const wallGrid = document.getElementById('wallGrid');
         const previewMask = document.getElementById('previewMask');
         const previewImg = document.getElementById('previewImg');
         const closePreview = document.getElementById('closePreview');
         const exportBtn = document.getElementById('exportBtn');
-        const importBtn = document.getElementById('importBtn');
         const importFile = document.getElementById('import-file');
         const linkInput = document.getElementById('linkInput');
-        const addLinkBtn = document.getElementById('addLinkBtn');
+        const addTempBtn = document.getElementById('addTempBtn');
 
-        // 内置你提供的图片链接
-        let wallList = JSON.parse(localStorage.getItem('wallpaperList')) || [
-            {
-                "url": "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVse9qM3ZwqHjkQCkkZS2xCvMavSz70QACFiMAAoLBoVXyysCgPKPgXTwE.jpg"
-            }
-        ];
+        // 本地临时图片（仅当前浏览器，换设备丢失）
+        let tempList = JSON.parse(localStorage.getItem('tempWall')) || [];
 
-        addLinkBtn.addEventListener('click', () => {
-            const url = linkInput.value.trim();
-            if (!url) {
-                alert("请输入图片链接");
-                return;
-            }
-            const ext = url.split('.').pop().toLowerCase();
-            if (!['jpg','jpeg','png','gif','webp'].includes(ext)) {
-                alert("链接不是图片格式，请检查");
-                return;
-            }
-            wallList.push({url});
-            localStorage.setItem('wallpaperList', JSON.stringify(wallList));
-            linkInput.value = "";
-            renderWall();
-            alert("添加成功");
-        });
+        // 合并固定永久图 + 本地临时图
+        function getAllImages() {
+            const arr = [];
+            fixedImages.forEach(url => arr.push({url}));
+            tempList.forEach(item => arr.push(item));
+            return arr;
+        }
 
+        // 渲染全部壁纸
         function renderWall() {
-            if (wallList.length === 0) {
-                wallGrid.innerHTML = '<div class="empty">暂无壁纸，请粘贴图片链接或导入JSON文件</div>';
+            const all = getAllImages();
+            if (all.length === 0) {
+                wallGrid.innerHTML = '<div class="empty">暂无壁纸</div>';
                 return;
             }
             let html = '';
-            wallList.forEach((item, index) => {
+            all.forEach((item, index) => {
                 html += `
-                <div class="wall-card" data-index="${index}">
+                <div class="wall-card">
                     <img src="${item.url}" alt="壁纸" class="preview-img" data-src="${item.url}">
                     <div class="card-action">
                         <a href="${item.url}" target="_blank" class="down-btn">下载原图</a>
-                        <button class="del-btn" data-index="${index}">删除</button>
                     </div>
                 </div>
                 `;
             });
             wallGrid.innerHTML = html;
-            bindCardEvent();
+            bindPreview();
         }
 
-        function bindCardEvent() {
+        // 大图预览绑定
+        function bindPreview() {
             document.querySelectorAll('.preview-img').forEach(img => {
                 img.onclick = () => {
                     previewImg.src = img.dataset.src;
                     previewMask.style.display = 'flex';
                 }
             });
-            document.querySelectorAll('.del-btn').forEach(btn => {
-                btn.onclick = () => {
-                    const idx = Number(btn.dataset.index);
-                    if (confirm("确定删除这张壁纸？仅删除本地记录，不会删除原图链接")) {
-                        wallList.splice(idx,1);
-                        localStorage.setItem('wallpaperList', JSON.stringify(wallList));
-                        renderWall();
-                    }
-                }
-            });
         }
 
+        // 关闭预览
         closePreview.onclick = () => previewMask.style.display = 'none';
         previewMask.onclick = (e) => {
             if (e.target === previewMask) previewMask.style.display = 'none';
         }
 
-        exportBtn.onclick = () => {
-            const jsonStr = JSON.stringify(wallList, null, 2);
-            const blob = new Blob([jsonStr], {type:"application/json"});
-            const a = document.createElement('a');
-            a.href = URL.createObject(blob);
-            a.download = "壁纸备份.json";
-            a.click();
-            URL.revokeObjectURL(a.href);
+        // 临时添加（仅本地缓存）
+        addTempBtn.onclick = () => {
+            const url = linkInput.value.trim();
+            if (!url) return alert("请输入图片链接");
+            const ext = url.split('.').pop().toLowerCase();
+            if (!['jpg','jpeg','png','gif','webp'].includes(ext)) return alert("不是图片链接");
+            tempList.push({url});
+            localStorage.setItem('tempWall', JSON.stringify(tempList));
+            linkInput.value = "";
+            renderWall();
+            alert("临时添加成功，换设备会消失！永久展示请写入上方fixedImages数组");
         }
 
-        importBtn.onclick = () => importFile.click();
-        importFile.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = ev => {
-                try {
-                    const data = JSON.parse(ev.target.result);
-                    if (!Array.isArray(data)) throw Error("格式错误");
-                    wallList = data;
-                    localStorage.setItem('wallpaperList', JSON.stringify(wallList));
-                    renderWall();
-                    alert("导入成功");
-                } catch {
-                    alert("JSON文件损坏/格式不对");
-                }
-            }
-            reader.readAsText(file);
-            importFile.value = "";
+        // 导出所有图片链接（复制里面url到fixedImages即可永久）
+        exportBtn.onclick = () => {
+            const all = getAllImages().map(i => i.url);
+            const json = JSON.stringify(all, null, 2);
+            const blob = new Blob([json], {type:"application/json"});
+            const a = document.createElement('a');
+            a.href = URL.createObject(blob);
+            a.download = "全部图片链接.json";
+            a.click();
+            URL.revokeObjectURL(a.href);
         }
 
         renderWall();
