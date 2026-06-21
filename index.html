@@ -111,12 +111,16 @@
             border-color: rgba(0, 220, 255, 0.6);
             box-shadow: 0 0 25px rgba(0, 210, 255, 0.35);
         }
-        .wall-card img {
+        .wall-card img,
+        .wall-card video {
             width: 100%;
             height: 180px;
             object-fit: cover;
             display: block;
             cursor: pointer;
+        }
+        .wall-card video {
+            background: #000;
         }
         .card-action {
             padding: 15px;
@@ -156,10 +160,15 @@
             justify-content: center;
             padding: 20px;
         }
-        .preview-mask img {
+        .preview-mask img,
+        .preview-mask video {
             max-width: 95%;
             max-height: 95%;
             object-fit: contain;
+        }
+        .preview-mask video {
+            background: #000;
+            max-height: 90vh;
         }
         .close-preview {
             position: absolute;
@@ -278,7 +287,7 @@
             </div>
 
             <div class="add-link-box">
-                <input id="linkInput" placeholder="临时添加图片（换设备消失，永久需写进代码）">
+                <input id="linkInput" placeholder="临时添加图片/视频（换设备消失，永久需写进代码）">
                 <br>
                 <button id="addTempBtn">临时添加（本地缓存）</button>
                 <p style="color:#aaa;margin-top:8px;font-size:13px;">⚠️ 想要换设备也显示，必须把链接加到下方JS的fixedImages数组，重新上传页面</p>
@@ -292,7 +301,8 @@
 
     <div class="preview-mask" id="previewMask">
         <span class="close-preview" id="closePreview">×</span>
-        <img id="previewImg" src="" alt="大图预览">
+        <img id="previewImg" src="" alt="大图预览" style="display: none;">
+        <video id="previewVideo" controls style="display: none;"></video>
     </div>
 
     <script>
@@ -301,12 +311,19 @@
         const LOGIN_STORAGE_KEY = "wallLoginAuth";
         // =================================================
 
-        // ===================== 永久图片（在这里新增链接，所有设备都能看到）=====================
+        // ===================== 永久壁纸（在这里新增链接，所有设备都能看到）=====================
         const fixedImages = [
+            // 原有图片壁纸
             "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVse9qM3ZwqHjkQCkkZS2xCvMavSz70QACFiMAAoLBoVXyysCgPKPgXTwE.jpg",
             "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVsgRqM3jGTgnr3syb7ztuclcHt35fSgACMCMAAoLBoVXG6YvfK6qc6TwE.png",
             "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVsjFqM30AAXyA1uSlDvi_HxgRK_BoRM0AAnQjAAKCwaFVfapo5nroNFs8BA.png",
             "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVwBdqNM_f6WSiZ9ZqyWp99HA1qvkP9gACmyAAAmzbqFXqtxyKJyeGUjwE.png",
+            // 本次新增PNG图片
+            "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEV0RJqN4aVBGoLRDwwc4cAAR-bnhWz37EAAs4jAALn07lVJaP7ROcLZDw8BA.png",
+            // 动态视频壁纸1
+            "https://cropgif.net/videos/1782022932124-66a03516-a7e6-4d51-adc9-ab4ae0923174.mp4",
+            // 动态视频壁纸2
+            "https://cropgif.net/videos/1782023395596-f40b26d1-fcf6-4a84-bb91-19fcdcfdd61f.mp4"
         ];
         // ======================================================================================
 
@@ -321,13 +338,14 @@
         const wallGrid = document.getElementById('wallGrid');
         const previewMask = document.getElementById('previewMask');
         const previewImg = document.getElementById('previewImg');
+        const previewVideo = document.getElementById('previewVideo');
         const closePreview = document.getElementById('closePreview');
         const exportBtn = document.getElementById('exportBtn');
         const importFile = document.getElementById('import-file');
         const linkInput = document.getElementById('linkInput');
         const addTempBtn = document.getElementById('addTempBtn');
 
-        // 本地临时图片（仅当前浏览器，换设备丢失）
+        // 本地临时壁纸（仅当前浏览器，换设备丢失）
         let tempList = JSON.parse(localStorage.getItem('tempWall')) || [];
 
         // 登录校验
@@ -375,11 +393,27 @@
         };
         logoutBtn.onclick = doLogout;
 
-        // 合并固定永久图 + 本地临时图
+        // 判断链接类型（图片/视频）
+        function getMediaType(url) {
+            const ext = url.split('.').pop().toLowerCase();
+            if (['jpg','jpeg','png','gif','webp','bmp'].includes(ext)) {
+                return 'image';
+            } else if (['mp4','webm','mov','avi','mkv'].includes(ext)) {
+                return 'video';
+            }
+            return 'unknown';
+        }
+
+        // 合并固定永久壁纸 + 本地临时壁纸
         function getAllImages() {
             const arr = [];
-            fixedImages.forEach(url => arr.push({url}));
-            tempList.forEach(item => arr.push(item));
+        fixedImages.forEach(url => arr.push({url, type: getMediaType(url)}));
+            tempList.forEach(item => {
+                if (!item.type) {
+                    item.type = getMediaType(item.url);
+                }
+                arr.push(item);
+            });
             return arr;
         }
 
@@ -392,56 +426,94 @@
             }
             let html = '';
             all.forEach((item, index) => {
-                html += `
-                <div class="wall-card">
-                    <img src="${item.url}" alt="壁纸" class="preview-img" data-src="${item.url}">
-                    <div class="card-action">
-                        <a href="${item.url}" target="_blank" class="down-btn">下载原图</a>
+                if (item.type === 'image') {
+                    html += `
+                    <div class="wall-card">
+                        <img src="${item.url}" alt="壁纸" class="preview-item" data-type="image" data-src="${item.url}">
+                        <div class="card-action">
+                            <a href="${item.url}" target="_blank" class="down-btn">下载原图</a>
+                        </div>
                     </div>
-                </div>
-                `;
+                    `;
+                } else if (item.type === 'video') {
+                    html += `
+                    <div class="wall-card">
+                        <video muted loop preload="metadata" class="preview-item" data-type="video" data-src="${item.url}">
+                            <source src="${item.url}" type="video/mp4">
+                        </video>
+                        <div class="card-action">
+                            <a href="${item.url}" target="_blank" class="down-btn">下载视频</a>
+                        </div>
+                    </div>
+                    `;
+                }
             });
             wallGrid.innerHTML = html;
             bindPreview();
         }
 
-        // 大图预览绑定
+        // 预览绑定
         function bindPreview() {
-            document.querySelectorAll('.preview-img').forEach(img => {
-                img.onclick = () => {
-                    previewImg.src = img.dataset.src;
+            document.querySelectorAll('.preview-item').forEach(item => {
+                item.onclick = () => {
+                    const type = item.dataset.type;
+                    const src = item.dataset.src;
+                    
+                    // 隐藏所有预览元素
+                    previewImg.style.display = 'none';
+                    previewVideo.style.display = 'none';
+                    
+                    if (type === 'image') {
+                        previewImg.src = src;
+                        previewImg.style.display = 'block';
+                    } else if (type === 'video') {
+                        previewVideo.src = src;
+                        previewVideo.style.display = 'block';
+                        previewVideo.play();
+                    }
+                    
                     previewMask.style.display = 'flex';
                 }
             });
         }
 
         // 关闭预览
-        closePreview.onclick = () => previewMask.style.display = 'none';
+        closePreview.onclick = () => {
+            previewMask.style.display = 'none';
+            previewVideo.pause(); // 暂停视频
+        };
         previewMask.onclick = (e) => {
-            if (e.target === previewMask) previewMask.style.display = 'none';
+            if (e.target === previewMask) {
+                previewMask.style.display = 'none';
+                previewVideo.pause(); // 暂停视频
+            }
         }
 
         // 临时添加（仅本地缓存）
         addTempBtn.onclick = () => {
             const url = linkInput.value.trim();
-            if (!url) return alert("请输入图片链接");
-            const ext = url.split('.').pop().toLowerCase();
-            if (!['jpg','jpeg','png','gif','webp'].includes(ext)) return alert("不是图片链接");
-            tempList.push({url});
+            if (!url) return alert("请输入图片/视频链接");
+            
+            const type = getMediaType(url);
+            if (type === 'unknown') return alert("不支持的文件类型，请输入图片或视频链接");
+            
+            tempList.push({url, type});
             localStorage.setItem('tempWall', JSON.stringify(tempList));
             linkInput.value = "";
             renderWall();
-            alert("临时添加成功，换设备会消失！永久展示请写入上方fixedImages数组");
+            
+            const tip = type === 'image' ? '图片' : '视频';
+            alert(`${tip}临时添加成功，换设备会消失！永久展示请写入上方fixedImages数组`);
         }
 
-        // 导出所有图片链接（复制里面url到fixedImages即可永久）
+        // 导出所有壁纸链接
         exportBtn.onclick = () => {
             const all = getAllImages().map(i => i.url);
             const json = JSON.stringify(all, null, 2);
             const blob = new Blob([json], {type:"application/json"});
             const a = document.createElement('a');
             a.href = URL.createObject(blob);
-            a.download = "全部图片链接.json";
+            a.download = "全部壁纸链接.json";
             a.click();
             URL.revokeObjectURL(a.href);
         }
