@@ -65,7 +65,7 @@
             border-radius: 12px;
             padding: 30px;
             max-width: 500px;
-            margin: 0 auto;
+            margin: 0 auto 24px auto;
             text-align: center;
         }
         .tool-card h3 {
@@ -245,7 +245,6 @@
             cursor: pointer;
             opacity: 0.7;
         }
-
         /* 登录弹窗样式 */
         .login-mask {
             position: fixed;
@@ -334,7 +333,6 @@
             <button id="loginBtn">确认登录</button>
         </div>
     </div>
-
     <!-- 主体内容（登录后才显示） -->
     <div class="main-wrap" id="mainWrap">
         <div class="container">
@@ -342,59 +340,66 @@
                 <h1>私人壁纸库（jialiqianjin）</h1>
                 <p class="desc">写死代码永久展示 | 临时添加仅当前浏览器生效</p>
             </div>
-
             <div class="logout-box">
                 <button id="logoutBtn">退出登录</button>
             </div>
-
-            <!-- 顶部导航栏 -->
+            <!-- 顶部导航栏：新增游戏按钮 -->
             <div class="nav-bar">
                 <button class="nav-btn active" data-target="wallModule">壁纸</button>
                 <button class="nav-btn" data-target="toolModule">极域反杀</button>
+                <button class="nav-btn" data-target="gameModule">游戏</button>
             </div>
-
             <!-- 模块1：壁纸模块 -->
             <div class="module show" id="wallModule">
                 <div class="tool-bar">
                     <button class="tool-btn" id="exportBtn">导出全部链接JSON</button>
                     <input type="file" id="import-file" accept=".json">
                 </div>
-
                 <div class="add-link-box">
                     <input id="linkInput" placeholder="临时添加图片/视频（换设备消失，永久需写进代码）">
                     <br>
                     <button id="addTempBtn">临时添加（本地缓存）</button>
                     <p style="color:#aaa;margin-top:8px;font-size:13px;">⚠️ 想要换设备也显示，必须把链接加到下方JS的fixedImages数组，重新上传页面</p>
                 </div>
-
                 <div class="wall-grid" id="wallGrid">
                     <div class="empty">加载中...</div>
                 </div>
             </div>
-
             <!-- 模块2：极域反杀工具模块 -->
             <div class="module" id="toolModule">
+                <!-- 原有极域工具包 -->
                 <div class="tool-card">
                     <h3>极域工具包</h3>
                     <p>解除机房极域电子教室限制工具</p>
                     <a class="download-exe" href="https://link.jiyiho.cn/orfile/down.php/08647e6775a2b7c85db35cbb2bb3e1d4.exe" target="_blank">点击下载exe</a>
                 </div>
+                <!-- 夕颜如雪工具箱 -->
+                <div class="tool-card">
+                    <h3>夕颜如雪工具箱</h3>
+                    <p>多功能机房解除限制工具箱</p>
+                    <a class="download-exe" href="https://easylink.cc/11e6ix" target="_blank">前往工具箱</a>
+                </div>
+            </div>
+            <!-- 模块3：新增游戏模块 -->
+            <div class="module" id="gameModule">
+                <div class="tool-card">
+                    <h3>LMFP联机软件</h3>
+                    <p>游戏联机工具软件</p>
+                    <a class="download-exe" href="https://easylink.cc/zzlzyk" target="_blank">前往下载/使用</a>
+                </div>
             </div>
         </div>
     </div>
-
     <div class="preview-mask" id="previewMask">
         <span class="close-preview" id="closePreview">×</span>
         <img id="previewImg" src="" alt="大图预览" style="display: none;">
         <video id="previewVideo" controls style="display: none;"></video>
     </div>
-
     <script>
         // ===================== 配置区 =====================
         const ACCESS_PASSWORD = "a12345678945";
         const LOGIN_STORAGE_KEY = "wallLoginAuth";
         // =================================================
-
         // 永久壁纸数组（你提供的6张动漫壁纸）
         const fixedImages = [
               // 原有图片壁纸
@@ -409,7 +414,6 @@
             // 动态视频壁纸2
             "https://cropgif.net/videos/1782023395596-f40b26d1-fcf6-4a84-bb91-19fcdcfdd61f.mp4"
         ];
-
         // DOM元素
         const loginMask = document.getElementById("loginMask");
         const mainWrap = document.getElementById("mainWrap");
@@ -428,8 +432,7 @@
         const addTempBtn = document.getElementById('addTempBtn');
         const navBtns = document.querySelectorAll(".nav-btn");
         const modules = document.querySelectorAll(".module");
-
-        // 导航切换逻辑
+        // 导航切换逻辑（自动兼容新增游戏模块）
         navBtns.forEach(btn => {
             btn.onclick = () => {
                 const targetId = btn.dataset.target;
@@ -441,10 +444,8 @@
                 document.getElementById(targetId).classList.add("show");
             }
         });
-
         // 本地临时壁纸
         let tempList = JSON.parse(localStorage.getItem('tempWall')) || [];
-
         // 登录校验
         function checkLogin() {
             const isLogin = localStorage.getItem(LOGIN_STORAGE_KEY) === "ok";
@@ -457,7 +458,6 @@
                 mainWrap.style.display = "none";
             }
         }
-
         // 登录操作
         function doLogin() {
             loginTip.textContent = "";
@@ -474,21 +474,18 @@
             localStorage.setItem(LOGIN_STORAGE_KEY, "ok");
             checkLogin();
         }
-
         // 退出登录
         function doLogout() {
             localStorage.removeItem(LOGIN_STORAGE_KEY);
             checkLogin();
             pwdInput.value = "";
         }
-
         // 绑定登录事件
         loginBtn.onclick = doLogin;
         pwdInput.onkeydown = e => {
             if (e.key === "Enter") doLogin();
         };
         logoutBtn.onclick = doLogout;
-
         // 判断媒体类型
         function getMediaType(url) {
             const ext = url.split('.').pop().toLowerCase();
@@ -499,7 +496,6 @@
             }
             return 'unknown';
         }
-
         // 合并壁纸列表
         function getAllImages() {
             const arr = [];
@@ -510,7 +506,6 @@
             });
             return arr;
         }
-
         // 渲染壁纸
         function renderWall() {
             const all = getAllImages();
@@ -545,7 +540,6 @@
             wallGrid.innerHTML = html;
             bindPreview();
         }
-
         // 大图预览绑定
         function bindPreview() {
             document.querySelectorAll('.preview-item').forEach(item => {
@@ -566,7 +560,6 @@
                 }
             });
         }
-
         // 关闭预览
         closePreview.onclick = () => {
             previewMask.style.display = 'none';
@@ -578,7 +571,6 @@
                 previewVideo.pause();
             }
         }
-
         // 临时添加素材
         addTempBtn.onclick = () => {
             const url = linkInput.value.trim();
@@ -591,19 +583,17 @@
             renderWall();
             alert(`${type === 'image' ? '图片' : '视频'}临时添加成功，换设备失效`);
         }
-
         // 导出链接
         exportBtn.onclick = () => {
             const all = getAllImages().map(i => i.url);
             const json = JSON.stringify(all, null, 2);
             const blob = new Blob([json], {type:"application/json"});
             const a = document.createElement('a');
-            a.href = URL.createObject(blob);
+            a.href = URL.createObjectURL(blob);
             a.download = "全部壁纸链接.json";
             a.click();
             URL.revokeObjectURL(a.href);
         }
-
         // 初始化登录检测
         checkLogin();
     </script>
