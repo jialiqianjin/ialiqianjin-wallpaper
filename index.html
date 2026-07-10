@@ -2,196 +2,458 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 替换为你指定的图片链接作为网页标签图标 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="icon" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEWbU5qRMgEVWpbgKvp-9X8Q9clpY7pOQAC1i0AAgNwKVY7gGNL3x6WEzwE.jpg" type="image/jpeg">
-    <title>私人壁纸库（jialiqianjin）</title>
+    <title>个人博客（jialiqianjin）</title>
+    <meta name="description" content="jialiqianjin 个人主页 | 壁纸收藏 · 实用工具 · 游戏资源">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Segoe UI", sans-serif;
+            font-family: "PingFang SC", "Microsoft Yahei", sans-serif;
         }
+
         body {
-            background: #050816;
-            background-image: radial-gradient(circle at 50% 20%, #101730 0%, #050816 70%);
-            color: #fff;
+            background-color: transparent;
+            background-image:
+                linear-gradient(rgba(20, 22, 37, 0.55), rgba(20, 22, 37, 0.55)),
+                url("https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEWxBNqTNXHGEBuIpFd1r0I7gbkkdW_lgACfyYAAkj5YVZRotD8WhhF5jwE.jpeg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #e4e7f5;
             min-height: 100vh;
-            padding: 2rem 1rem;
+            line-height: 1.7;
+            position: relative;
+            overflow-x: hidden;
         }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.08);
+            pointer-events: none;
+            z-index: 0;
+        }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            padding: 2rem 1.2rem;
         }
-        /* 导航栏样式 */
+
+        /* 顶端横向导航栏 */
         .nav-bar {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(0, 220, 255, 0.2);
+            gap: 24px;
+            margin-bottom: 3rem;
+            padding: 12px 16px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.045);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 10;
         }
+
         .nav-btn {
-            padding: 10px 30px;
-            font-size: 1.1rem;
+            padding: 10px 28px;
+            font-size: 1rem;
             border: none;
-            border-radius: 8px;
-            background: rgba(25, 35, 60, 0.6);
-            color: #fff;
+            border-radius: 999px;
+            background: transparent;
+            color: #d0d8f0;
             cursor: pointer;
             transition: 0.25s;
-            border: 1px solid transparent;
         }
+
         .nav-btn.active {
-            border-color: rgba(0, 220, 255, 0.6);
-            box-shadow: 0 0 12px rgba(0, 216, 255, 0.4);
-            background: linear-gradient(90deg, #224488, #5522aa);
+            background: rgba(190, 110, 220, 0.35);
+            color: #fff;
         }
+
         .nav-btn:hover {
-            box-shadow: 0 0 12px rgba(0, 216, 255, 0.4);
+            background: rgba(255, 255, 255, 0.08);
         }
-        /* 内容模块 切换隐藏 */
+
+        /* 首页整体布局 */
+        .home-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* 欢迎卡片：禁止点击、无小手、无波纹，半透毛玻璃 */
+        .user-card {
+            background: rgba(255, 255, 255, 0.045);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 24px;
+            padding: 40px 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            max-width: 460px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        .avatar {
+            width: 86px;
+            height: 86px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid rgba(190, 110, 220, 0.35);
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .greeting h2 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #e2e8ff;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        /* 波纹动画移到CSS区，修复JS报错 */
+        @keyframes rippleSpread {
+            to { transform: scale(2.5); opacity: 0; }
+        }
+        /* 通用卡片波纹样式（仅非首页卡片生效） */
+        .ripple-box {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        /* 时间+音乐 左右50%并排容器 */
+        .row-two-card {
+            display: flex;
+            gap: 2rem;
+            width: 100%;
+        }
+        .col-half {
+            width: 50%;
+        }
+
+        /* 时间卡片 高透明样式 */
+        .time-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .time-box {
+            text-align: center;
+        }
+        .time-text {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #d8e1ff;
+            text-shadow: 0 0 18px rgba(190, 110, 220, 0.35);
+        }
+        .date-text {
+            font-size: 0.9rem;
+            color: #9aa2c2;
+            margin-top: 6px;
+        }
+
+        /* 首页音乐卡片 高透明样式 */
+        .mini-music-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 20px;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .music-top {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .music-cover {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .music-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .music-info {
+            flex: 1;
+            overflow: hidden;
+        }
+        .music-name {
+            font-size: 1rem;
+            color: #e2e8ff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .music-artist {
+            font-size: 0.82rem;
+            color: #9aa2c2;
+            margin-top: 4px;
+        }
+        .progress-wrap {
+            width: 100%;
+            height: 5px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 99px;
+            cursor: pointer;
+            position: relative;
+            margin-bottom: 12px;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg,#be6edc,#6394ff);
+            border-radius: 99px;
+        }
+        .music-time {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: #9aa2c2;
+        }
+        .music-control {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 14px;
+        }
+        .ctrl-btn {
+            background: transparent;
+            border: none;
+            color: #d0d8f0;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        /* 音乐模块内部卡片 高透明 */
+        .music-set-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .music-set-card h3 {
+            margin-bottom: 20px;
+            color: #e2e8ff;
+        }
+        .song-item {
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .song-item:hover {
+            background: rgba(190, 110, 220, 0.2);
+        }
+        .song-item.active {
+            background: rgba(190, 110, 220, 0.25);
+        }
+        .loop-box {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .loop-box label {
+            cursor: pointer;
+        }
+
+        /* 模块切换样式（无弹窗，直接切换） */
         .module {
             display: none;
+            animation: fadeIn 0.35s ease;
         }
         .module.show {
             display: block;
         }
-        /* 极域工具卡片 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 工具/游戏卡片 高透明样式 */
         .tool-card {
-            background: rgba(25, 35, 60, 0.6);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(0, 220, 255, 0.25);
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 500px;
-            margin: 0 auto 24px auto;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 600px;
+            margin: 0 auto 32px auto;
             text-align: center;
+            transition: all 0.35s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .tool-card:hover {
+            border-color: rgba(190, 110, 220, 0.22);
+            background: rgba(255, 255, 255, 0.065);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
         .tool-card h3 {
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            background: linear-gradient(90deg, #00d8ff, #8b5cf6);
-            -webkit-background-clip: text;
-            color: transparent;
+            font-size: 1.45rem;
+            margin-bottom: 14px;
+            color: #d8e1ff;
+            font-weight: 550;
+        }
+        .tool-card p {
+            color: #9aa2c2;
+            margin-bottom: 16px;
         }
         .download-exe {
             display: inline-block;
-            margin-top: 12px;
-            padding: 10px 26px;
-            background: linear-gradient(90deg, #0099e5, #6c2bd9);
-            color: #fff;
+            margin-top: 10px;
+            padding: 12px 30px;
+            background: linear-gradient(120deg, #7b4bb8, #4f62b3);
+            color: #ffffff;
             text-decoration: none;
-            border-radius: 8px;
-            transition: 0.2s;
+            border-radius: 12px;
+            transition: 0.3s;
+            font-weight: 450;
         }
         .download-exe:hover {
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
-        }
-        header {
-            text-align: center;
-            padding: 2rem 0;
-            border-bottom: 1px solid rgba(0, 220, 255, 0.2);
-            margin-bottom: 2rem;
-        }
-        h1 {
-            font-size: 2.5rem;
-            background: linear-gradient(90deg, #00d8ff, #8b5cf6);
-            -webkit-background-clip: text;
-            color: transparent;
-            letter-spacing: 6px;
-        }
-        .desc {
-            color: rgba(255,255,0.5);
-            margin-top: 0.8rem;
+            opacity: 0.93;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 18px rgba(123, 75, 184, 0.35);
         }
         .tool-bar {
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2.5rem;
             gap: 12px;
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
         }
         .tool-btn {
-            padding: 8px 20px;
-            background: linear-gradient(90deg, #224488, #5522aa);
-            color: #fff;
-            border: none;
-            border-radius: 6px;
+            padding: 8px 22px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #d0d8f0;
             cursor: pointer;
             font-size: 0.9rem;
-            transition: 0.2s;
         }
         .tool-btn:hover {
-            box-shadow: 0 0 12px rgba(0, 216, 255, 0.4);
+            background: rgba(255, 255, 255, 0.11);
         }
         #import-file {
             display: none;
         }
         .add-link-box {
-            background: rgba(25, 35, 60, 0.5);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 220, 255, 0.3);
-            border-radius: 16px;
-            padding: 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 2.2rem;
             text-align: center;
-            margin-bottom: 2.5rem;
+            margin-bottom: 3.5rem;
+            position: relative;
+            overflow: hidden;
         }
         #linkInput {
             width: 100%;
-            max-width: 800px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            border: 1px solid #00a8ff60;
-            background: rgba(0,0,0,0.3);
-            color: #fff;
-            font-size: 14px;
+            max-width: 850px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(0, 0, 0, 0.18);
+            color: #e0e4ff;
+            font-size: 15px;
             outline: none;
         }
         #addTempBtn {
-            margin-top: 12px;
-            padding: 10px 28px;
-            background: linear-gradient(90deg, #777, #444);
-            border: none;
-            border-radius: 8px;
-            color: #fff;
+            margin-top: 14px;
+            padding: 11px 30px;
+            background: rgba(123, 75, 184, 0.18);
+            border: 1px solid rgba(190, 110, 220, 0.25);
+            border-radius: 12px;
+            color: #d0d8ff;
             cursor: pointer;
             font-size: 1rem;
         }
         .wall-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 30px;
         }
         .wall-card {
-            background: rgba(25, 35, 60, 0.6);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(0, 220, 255, 0.25);
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.35s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
         }
         .wall-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(0, 220, 255, 0.6);
-            box-shadow: 0 0 25px rgba(0, 210, 255, 0.35);
+            transform: translateY(-6px);
+            border-color: rgba(190, 110, 220, 0.25);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
-        .wall-card img,
-        .wall-card video {
+        .wall-card img, .wall-card video {
             width: 100%;
-            height: 180px;
+            height: 200px;
             object-fit: cover;
             display: block;
             cursor: pointer;
         }
         .wall-card video {
-            background: #000;
+            background: #0b0c15;
         }
         .card-action {
-            padding: 15px;
+            padding: 18px;
             text-align: center;
             display: flex;
             gap: 8px;
@@ -199,21 +461,18 @@
             flex-wrap: wrap;
         }
         .down-btn {
-            padding: 7px 16px;
+            padding: 8px 20px;
             color: #fff;
             text-decoration: none;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            transition: 0.2s;
-            border: none;
-            cursor: pointer;
-            background: linear-gradient(90deg, #0099e5, #6c2bd9);
+            border-radius: 8px;
+            font-size: 0.88rem;
+            background: linear-gradient(120deg, #7b4bb8, #4f62b3);
         }
         .empty {
             grid-column: 1 / -1;
             text-align: center;
-            color: rgba(255,255,0.3);
-            padding: 3rem 0;
+            color: #868fb0;
+            padding: 4rem 0;
         }
         .preview-mask {
             position: fixed;
@@ -221,37 +480,31 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0,0,0,0.92);
+            background: rgba(10, 11, 20, 0.95);
             z-index: 999;
             display: none;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
-        .preview-mask img,
-        .preview-mask video {
-            max-width: 95%;
-            max-height: 95%;
+        .preview-mask img, .preview-mask video {
+            max-width: 92%;
+            max-height: 92%;
             object-fit: contain;
-        }
-        .preview-mask video {
-            background: #000;
-            max-height: 90vh;
         }
         .close-preview {
             position: absolute;
-            top: 25px;
-            right: 35px;
-            font-size: 2.2rem;
-            color: #fff;
+            top: 30px;
+            right: 40px;
+            font-size: 2.3rem;
+            color: #d0d8ff;
             cursor: pointer;
             opacity: 0.7;
         }
-        /* 登录弹窗样式 */
         .login-mask {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.95);
+            background: rgba(10, 11, 20, 0.97);
             z-index: 9999;
             display: flex;
             align-items: center;
@@ -260,68 +513,83 @@
         }
         .login-box {
             width: 100%;
-            max-width: 420px;
-            background: rgba(22, 30, 55, 0.8);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(0, 220, 255, 0.3);
-            border-radius: 16px;
-            padding: 40px 30px;
+            max-width: 430px;
+            background: rgba(28, 30, 42, 0.88);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 42px 32px;
             text-align: center;
         }
         .login-box h2 {
-            font-size: 1.8rem;
-            background: linear-gradient(90deg, #00d8ff, #8b5cf6);
-            -webkit-background-clip: text;
-            color: transparent;
-            margin-bottom: 24px;
+            font-size: 1.85rem;
+            color: #d8e0ff;
+            margin-bottom: 26px;
             letter-spacing: 2px;
         }
         #pwdInput {
             width: 100%;
-            padding: 14px 16px;
-            border-radius: 8px;
-            border: 1px solid #00a8ff60;
-            background: rgba(0,0,0,0.4);
-            color: #fff;
+            padding: 15px 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(0, 0, 0, 0.22);
+            color: #e0e4ff;
             font-size: 16px;
             outline: none;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
         #loginBtn {
             width: 100%;
-            padding: 13px;
+            padding: 14px;
             border: none;
-            border-radius: 8px;
-            background: linear-gradient(90deg, #0099e5, #6c2bd9);
+            border-radius: 12px;
+            background: linear-gradient(120deg, #7b4bb8, #4f62b3);
             color: #fff;
-            font-size: 1rem;
+            font-size: 1.05rem;
             cursor: pointer;
-            transition: 0.2s;
-        }
-        #loginBtn:hover {
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
+            /* 强制提升点击层级，修复移动端点击穿透失效 */
+            position: relative;
+            z-index: 99999;
         }
         .login-tip {
-            color: #ff6b6b;
+            color: #ffadb6;
             font-size: 14px;
-            height: 20px;
-            margin-bottom: 10px;
+            height: 22px;
+            margin-bottom: 12px;
+        }
+        .main-wrap {
+            display: none;
         }
         .logout-box {
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 2rem;
         }
         #logoutBtn {
-            padding: 6px 16px;
-            background: #442244;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            color: #c5cceb;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
-        /* 未登录隐藏主体内容 */
-        .main-wrap {
-            display: none;
+        #logoutBtn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(190, 110, 220, 0.25);
+        }
+
+        /* 移动端适配 */
+        @media (max-width:768px) {
+            .row-two-card {
+                flex-direction: column;
+            }
+            .col-half {
+                width: 100%;
+            }
+            .greeting h2 {
+                font-size: 2.2rem;
+            }
         }
     </style>
 </head>
@@ -329,286 +597,456 @@
     <!-- 登录弹窗 -->
     <div class="login-mask" id="loginMask">
         <div class="login-box">
-            <h2>私人壁纸库 验证登录</h2>
+            <h2>个人博客 验证登录</h2>
             <div class="login-tip" id="loginTip"></div>
             <input type="password" id="pwdInput" placeholder="请输入访问密码">
             <button id="loginBtn">确认登录</button>
         </div>
     </div>
-    <!-- 主体内容（登录后才显示） -->
+
     <div class="main-wrap" id="mainWrap">
         <div class="container">
-            <header>
-                <h1>私人壁纸库（jialiqianjin）</h1>
-                <p class="desc">写死代码永久展示 | 临时添加仅当前浏览器生效</p>
+            <!-- 导航栏 -->
+            <div class="nav-bar">
+                <button class="nav-btn active" data-target="homeModule">首页</button>
+                <button class="nav-btn" data-target="wallModule">壁纸</button>
+                <button class="nav-btn" data-target="toolModule">极域反杀</button>
+                <button class="nav-btn" data-target="gameModule">游戏</button>
+                <button class="nav-btn" data-target="musicModule">音乐</button>
             </div>
             <div class="logout-box">
                 <button id="logoutBtn">退出登录</button>
             </div>
-            <!-- 顶部导航栏 -->
-            <div class="nav-bar">
-                <button class="nav-btn active" data-target="wallModule">壁纸</button>
-                <button class="nav-btn" data-target="toolModule">极域反杀</button>
-                <button class="nav-btn" data-target="gameModule">游戏</button>
+
+            <!-- 首页模块（默认显示） -->
+            <div class="module show" id="homeModule">
+                <div class="home-wrap">
+                    <div class="user-card">
+                        <div class="avatar">
+                            <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEWbU5qRMgEVWpbgKvp-9X8Q9clpY7pOQAC1i0AAgNwKVY7gGNL3x6WEzwE.jpg" alt="个人头像">
+                        </div>
+                        <div class="greeting">
+                            <h2>欢迎回来，加力前进</h2>
+                        </div>
+                    </div>
+                    <div class="row-two-card">
+                        <div class="col-half">
+                            <div class="time-card ripple-box">
+                                <div class="time-box">
+                                    <div class="time-text" id="timeText">00:00</div>
+                                    <div class="date-text" id="dateText">2026年07月10日 星期五</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-half">
+                            <div class="mini-music-card ripple-box">
+                                <div class="music-top">
+                                    <div class="music-cover">
+                                        <img id="miniCover" src="" alt="歌曲封面">
+                                    </div>
+                                    <div class="music-info">
+                                        <div class="music-name" id="miniName">暂无歌曲</div>
+                                        <div class="music-artist" id="miniArtist">—</div>
+                                    </div>
+                                </div>
+                                <div class="progress-wrap" id="progressWrap">
+                                    <div class="progress-bar" id="progressBar"></div>
+                                </div>
+                                <div class="music-time">
+                                    <span id="curTime">00:00</span>
+                                    <span id="totalTime">00:00</span>
+                                </div>
+                                <div class="music-control">
+                                    <button class="ctrl-btn" id="prevBtn">⏮</button>
+                                    <button class="ctrl-btn" id="playBtn">▶</button>
+                                    <button class="ctrl-btn" id="nextBtn">⏭</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align:center;padding:4rem 0;color:#a8adc8;font-size:1.2rem;">
+                        欢迎进入个人博客，可在上方导航栏切换功能
+                    </div>
+                </div>
             </div>
-            <!-- 模块1：壁纸模块 -->
-            <div class="module show" id="wallModule">
+
+            <!-- 壁纸模块 -->
+            <div class="module" id="wallModule">
                 <div class="tool-bar">
                     <button class="tool-btn" id="exportBtn">导出全部链接JSON</button>
                     <input type="file" id="import-file" accept=".json">
                 </div>
-                <div class="add-link-box">
+                <div class="add-link-box ripple-box">
                     <input id="linkInput" placeholder="临时添加图片/视频（换设备消失，永久需写进代码）">
                     <br>
                     <button id="addTempBtn">临时添加（本地缓存）</button>
-                    <p style="color:#aaa;margin-top:8px;font-size:13px;">⚠️ 想要换设备也显示，必须把链接加到下方JS的fixedImages数组，重新上传页面</p>
+                    <p style="color:#868fb0;margin-top:8px;font-size:13px;">⚠️ 想要换设备也显示，必须把链接加到fixedImages数组，重新上传页面</p>
                 </div>
-                <div class="wall-grid" id="wallGrid">
-                    <div class="empty">加载中...</div>
-                </div>
+                <div class="wall-grid" id="wallGrid"></div>
             </div>
-            <!-- 模块2：极域反杀工具模块 -->
+
+            <!-- 工具模块 -->
             <div class="module" id="toolModule">
-                <div class="tool-card">
+                <div class="tool-card ripple-box">
                     <h3>极域工具包</h3>
                     <p>解除机房极域电子教室限制工具</p>
                     <a class="download-exe" href="https://link.jiyiho.cn/orfile/down.php/08647e6775a2b7c85db35cbb2bb3e1d4.exe" target="_blank">点击下载exe</a>
                 </div>
-                <div class="tool-card">
-                    <h3>夕颜如雪工具箱</h3>
+                <div class="tool-card ripple-box">
+                    <h3>夕颜如雪</h3>
                     <p>多功能机房解除限制工具箱</p>
                     <a class="download-exe" href="https://easylink.cc/11e6ix" target="_blank">前往工具箱</a>
                 </div>
             </div>
-            <!-- 模块3：游戏模块（新增鸭蛋快跑） -->
+
+            <!-- 游戏模块 -->
             <div class="module" id="gameModule">
-                <!-- 1. LMFP联机软件 -->
-                <div class="tool-card">
+                <div class="tool-card ripple-box">
                     <h3>LMFP联机软件</h3>
                     <p>游戏联机工具软件</p>
                     <a class="download-exe" href="https://easylink.cc/zzlzyk" target="_blank">前往下载/使用</a>
                 </div>
-                <!-- 2. 我的世界1.21.11 -->
-                <div class="tool-card">
+                <div class="tool-card ripple-box">
                     <h3>我的世界1.21.11</h3>
                     <p>MC游戏本体压缩包</p>
                     <a class="download-exe" href="https://pan.vma.cc/pan/d/f28772c635d62832d5653c728cc1c2bc?ext=zip" target="_blank">网盘下载</a>
                 </div>
-                <!-- 3. Java22运行环境 -->
-                <div class="tool-card">
+                <div class="tool-card ripple-box">
                     <h3>Java22</h3>
                     <p>我的世界Java版运行依赖</p>
                     <a class="download-exe" href="https://pan.vma.cc/pan/d/12d5093260e9273eafc4404ad1b2c7cc?ext=zip" target="_blank">网盘下载</a>
                 </div>
-                <!-- 4. 鸭蛋快跑 -->
-                <div class="tool-card">
+                <div class="tool-card ripple-box">
                     <h3>鸭蛋快跑</h3>
                     <p>休闲小游戏</p>
                     <a class="download-exe" href="https://easylink.cc/zob528" target="_blank">前往游玩</a>
                 </div>
             </div>
+
+            <!-- 音乐模块 -->
+            <div class="module" id="musicModule">
+                <div class="music-page-wrap">
+                    <div class="music-set-card ripple-box">
+                        <h3>歌曲列表</h3>
+                        <div id="songListBox"></div>
+                        <div class="loop-box">
+                            <input type="checkbox" id="loopCheck">
+                            <label for="loopCheck">开启单曲循环</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- 图片预览弹窗 -->
     <div class="preview-mask" id="previewMask">
         <span class="close-preview" id="closePreview">×</span>
-        <img id="previewImg" src="" alt="大图预览" style="display: none;">
-        <video id="previewVideo" controls style="display: none;"></video>
+        <img id="previewImg" style="display:none;">
+        <video id="previewVideo" controls style="display:none;"></video>
     </div>
+
     <script>
-        // ===================== 配置区 =====================
-        const ACCESS_PASSWORD = "a12345678945";
-        const LOGIN_STORAGE_KEY = "wallLoginAuth";
-        // =================================================
-        // 永久壁纸数组（你提供的6张动漫壁纸）
-        const fixedImages = [
-            "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVse9qM3ZwqHjkQCkkZS2xCvMavSz70QACFiMAAoLBoVXyysCgPKPgXTwE.jpg",
-            "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVsgRqM3jGTgnr3syb7ztuclcHt35fSgACMCMAAoLBoVXG6YvfK6qc6TwE.png",
-            "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVsjFqM30AAXyA1uSlDvi_HxgRK_BoRM0AAnQjAAKCwaFVfapo5nroNFs8BA.png",
-            "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVwBdqNM_f6WSiZ9ZqyWp99HA1qvkP9gACmyAAAmzbqFXqtxyKJyeGUjwE.png",
-            "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEV0RJqN4aVBGoLRDwwc4cAAR-bnhWz37EAAs4jAALn07lVJaP7ROcLZDw8BA.png",
-            "https://cropgif.net/videos/1782022932124-66a03516-a7e6-4d51-adc9-ab4ae0923174.mp4",
-            "https://cropgif.net/videos/1782023395596-f40b26d1-fcf6-4a84-bb91-19fcdcfdd61f.mp4"
-        ];
-        // DOM元素
-        const loginMask = document.getElementById("loginMask");
-        const mainWrap = document.getElementById("mainWrap");
-        const pwdInput = document.getElementById("pwdInput");
-        const loginBtn = document.getElementById("loginBtn");
-        const loginTip = document.getElementById("loginTip");
-        const logoutBtn = document.getElementById("logoutBtn");
-        const wallGrid = document.getElementById('wallGrid');
-        const previewMask = document.getElementById('previewMask');
-        const previewImg = document.getElementById('previewImg');
-        const previewVideo = document.getElementById('previewVideo');
-        const closePreview = document.getElementById('closePreview');
-        const exportBtn = document.getElementById('exportBtn');
-        const importFile = document.getElementById('import-file');
-        const linkInput = document.getElementById('linkInput');
-        const addTempBtn = document.getElementById('addTempBtn');
-        const navBtns = document.querySelectorAll(".nav-btn");
-        const modules = document.querySelectorAll(".module");
-        // 导航切换逻辑
-        navBtns.forEach(btn => {
-            btn.onclick = () => {
-                const targetId = btn.dataset.target;
-                navBtns.forEach(b => b.classList.remove("active"));
-                modules.forEach(m => m.classList.remove("show"));
-                btn.classList.add("active");
-                document.getElementById(targetId).classList.add("show");
-            }
-        });
-        // 本地临时壁纸
-        let tempList = JSON.parse(localStorage.getItem('tempWall')) || [];
-        // 登录校验
-        function checkLogin() {
-            const isLogin = localStorage.getItem(LOGIN_STORAGE_KEY) === "ok";
-            if (isLogin) {
-                loginMask.style.display = "none";
-                mainWrap.style.display = "block";
-                renderWall();
-            } else {
-                loginMask.style.display = "flex";
-                mainWrap.style.display = "none";
-            }
-        }
-        // 登录操作
-        function doLogin() {
-            loginTip.textContent = "";
-            const pwd = pwdInput.value.trim();
-            if (!pwd) {
-                loginTip.textContent = "请输入密码";
-                return;
-            }
-            if (pwd !== ACCESS_PASSWORD) {
-                loginTip.textContent = "密码错误，请重新输入";
-                pwdInput.value = "";
-                return;
-            }
-            localStorage.setItem(LOGIN_STORAGE_KEY, "ok");
-            checkLogin();
-        }
-        // 退出登录
-        function doLogout() {
-            localStorage.removeItem(LOGIN_STORAGE_KEY);
-            checkLogin();
-            pwdInput.value = "";
-        }
-        // 绑定登录事件
-        loginBtn.onclick = doLogin;
-        pwdInput.onkeydown = e => {
-            if (e.key === "Enter") doLogin();
+        // 全局异常捕获，防止JS卡死阻断登录
+        window.onerror = function(msg,src,line){
+            console.error("JS异常：",msg,src,line);
+            const tipDom = document.getElementById("loginTip");
+            if(tipDom) tipDom.textContent = "脚本异常："+msg;
         };
-        logoutBtn.onclick = doLogout;
-        // 判断媒体类型
-        function getMediaType(url) {
-            const ext = url.split('.').pop().toLowerCase();
-            if (['jpg','jpeg','png','gif','webp','bmp'].includes(ext)) {
-                return 'image';
-            } else if (['mp4','webm','mov','avi','mkv'].includes(ext)) {
-                return 'video';
+
+        // 页面加载完成后再执行所有逻辑，避免DOM未加载绑定失败
+        window.onload = function(){
+            const ACCESS_PASSWORD = "a12345678945";
+            const LOGIN_STORAGE_KEY = "wallLoginAuth";
+            const musicList = [
+                {name: "歌曲名称1",artist: "歌手名",cover: "https://via.placeholder.com/100",src: "#"},
+                {name: "歌曲名称2",artist: "歌手名",cover: "https://via.placeholder.com/100",src: "#"}
+            ];
+            let currentIndex = 0;
+            let isLoop = false;
+            const audio = new Audio();
+            const fixedImages = [
+                "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVse9qM3ZwqHjkQCkkZS2xCvMavSz70QACFiMAAoLBoVXyysCgPKPgXTwE.jpg",
+                "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVsgRqM3jGTgnr3syb7ztuclcHt35fSgACMCMAAoLBoVXG6YvfK6qc6TwE.png",
+                "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVsjFqM30AAXyA1uSlDvi_HxgRK_BoRM0AAnQjAAKCwaFVfapo5nroNFs8BA.png",
+                "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVwBdqNM_f6WSiZ9ZqyWp99HA1qvkP9gACmyAAAmzbqFXqtxyKJyeGUjwE.png",
+                "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEV0RJqN4aVBGoLRDwwc4cAAR-bnhWz37EAAs4jAALn07lVJaP7ROcLZDw8BA.png",
+                "https://cropgif.net/videos/1782022932124-66a03516-a7e6-4d51-adc9-ab4ae0923174.mp4",
+                "https://cropgif.net/videos/1782023395596-f40b26d1-fcf6-4a84-bb91-19fcdcfdd61f.mp4"
+            ];
+
+            // 时间更新
+            function updateTime(){
+                const now = new Date();
+                const h = String(now.getHours()).padStart(2,'0');
+                const m = String(now.getMinutes()).padStart(2,'0');
+                const week = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+                document.getElementById('timeText').textContent = `${h}:${m}`;
+                document.getElementById('dateText').textContent = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${week[now.getDay()]}`;
             }
-            return 'unknown';
-        }
-        // 合并壁纸列表
-        function getAllImages() {
-            const arr = [];
-            fixedImages.forEach(url => arr.push({url, type: getMediaType(url)}));
-            tempList.forEach(item => {
-                if (!item.type) item.type = getMediaType(item.url);
-                arr.push(item);
-            });
-            return arr;
-        }
-        // 渲染壁纸
-        function renderWall() {
-            const all = getAllImages();
-            if (all.length === 0) {
-                wallGrid.innerHTML = '<div class="empty">暂无壁纸</div>';
-                return;
-            }
-            let html = '';
-            all.forEach(item => {
-                if (item.type === 'image') {
-                    html += `
-                    <div class="wall-card">
-                        <img src="${item.url}" alt="壁纸" class="preview-item" data-type="image" data-src="${item.url}">
-                        <div class="card-action">
-                            <a href="${item.url}" target="_blank" class="down-btn">下载原图</a>
-                        </div>
-                    </div>
-                    `;
-                } else if (item.type === 'video') {
-                    html += `
-                    <div class="wall-card">
-                        <video muted loop preload="metadata" class="preview-item" data-type="video" data-src="${item.url}">
-                            <source src="${item.url}" type="video/mp4">
-                        </video>
-                        <div class="card-action">
-                            <a href="${item.url}" target="_blank" class="down-btn">下载视频</a>
-                        </div>
-                    </div>
-                    `;
-                }
-            });
-            wallGrid.innerHTML = html;
-            bindPreview();
-        }
-        // 大图预览绑定
-        function bindPreview() {
-            document.querySelectorAll('.preview-item').forEach(item => {
-                item.onclick = () => {
-                    const type = item.dataset.type;
-                    const src = item.dataset.src;
-                    previewImg.style.display = 'none';
-                    previewVideo.style.display = 'none';
-                    if (type === 'image') {
-                        previewImg.src = src;
-                        previewImg.style.display = 'block';
-                    } else {
-                        previewVideo.src = src;
-                        previewVideo.style.display = 'block';
-                        previewVideo.play();
+            updateTime();
+            setInterval(updateTime, 1000);
+
+            // 登录核心逻辑（双重绑定：onclick + addEventListener，彻底修复点击失效）
+            const loginMask = document.getElementById("loginMask");
+            const mainWrap = document.getElementById("mainWrap");
+            const pwdInput = document.getElementById("pwdInput");
+            const loginBtn = document.getElementById("loginBtn");
+            const loginTip = document.getElementById("loginTip");
+            const logoutBtn = document.getElementById("logoutBtn");
+
+            function checkLogin(){
+                try{
+                    if(localStorage.getItem(LOGIN_STORAGE_KEY) === "ok"){
+                        loginMask.style.display = "none";
+                        mainWrap.style.display = "block";
+                        renderWall();
+                        renderSongList();
+                    }else{
+                        loginMask.style.display = "flex";
+                        mainWrap.style.display = "none";
                     }
-                    previewMask.style.display = 'flex';
+                }catch(e){
+                    loginTip.textContent = "本地存储异常，请清除缓存重试";
                 }
-            });
-        }
-        // 关闭预览
-        closePreview.onclick = () => {
-            previewMask.style.display = 'none';
-            previewVideo.pause();
-        };
-        previewMask.onclick = (e) => {
-            if (e.target === previewMask) {
-                previewMask.style.display = 'none';
-                previewVideo.pause();
             }
+
+            function doLogin(){
+                loginTip.textContent = "";
+                const inputPwd = pwdInput.value.trim();
+                if(inputPwd !== ACCESS_PASSWORD){
+                    loginTip.textContent = "密码错误，请重新输入";
+                    pwdInput.value = "";
+                    return;
+                }
+                localStorage.setItem(LOGIN_STORAGE_KEY, "ok");
+                checkLogin();
+            }
+
+            function doLogout(){
+                localStorage.removeItem(LOGIN_STORAGE_KEY);
+                checkLogin();
+            }
+
+            // 双重绑定点击事件，防止单一种绑定失效
+            loginBtn.onclick = doLogin;
+            loginBtn.addEventListener("click", doLogin);
+            // 回车登录
+            pwdInput.onkeydown = function(e){
+                if(e.key === "Enter") doLogin();
+            };
+            // 退出登录
+            logoutBtn.onclick = doLogout;
+
+            // 壁纸渲染
+            const wallGrid = document.getElementById('wallGrid');
+            const previewMask = document.getElementById('previewMask');
+            const previewImg = document.getElementById('previewImg');
+            const previewVideo = document.getElementById('previewVideo');
+            const closePreview = document.getElementById('closePreview');
+            const exportBtn = document.getElementById('exportBtn');
+            const importFile = document.getElementById('import-file');
+            const linkInput = document.getElementById('linkInput');
+            const addTempBtn = document.getElementById('addTempBtn');
+            let tempList = [];
+            try{
+                tempList = JSON.parse(localStorage.getItem('tempWall')) || [];
+            }catch(err){
+                tempList = [];
+            }
+            function getMediaType(url){
+                const ext = url.split('.').pop().toLowerCase();
+                return ['jpg','jpeg','png','gif','webp','bmp'].includes(ext) ? "img" : "video";
+            }
+            function renderWall(){
+                const all = [...fixedImages,...tempList];
+                if(all.length === 0){
+                    wallGrid.innerHTML = '<div class="empty">暂无壁纸资源</div>';
+                    return;
+                }
+                let html = "";
+                all.forEach(u=>{
+                    const t = getMediaType(u);
+                    if(t === "img"){
+                        html += `<div class="wall-card ripple-box"><img class="preview-item" data-src="${u}" src="${u}"><div class="card-action"><a class="down-btn" target="_blank" href="${u}">下载原图</a></div></div>`;
+                    }else{
+                        html += `<div class="wall-card ripple-box"><video muted loop preload="metadata" class="preview-item" data-src="${u}"><source src="${u}"></video><div class="card-action"><a class="down-btn" target="_blank" href="${u}">下载视频</a></div></div>`;
+                    }
+                });
+                wallGrid.innerHTML = html;
+                bindPreview();
+            }
+            function bindPreview(){
+                document.querySelectorAll('.preview-item').forEach(el=>{
+                    el.onclick = function(){
+                        const src = this.dataset.src;
+                        const t = getMediaType(src);
+                        previewImg.style.display = "none";
+                        previewVideo.style.display = "none";
+                        if(t === "img"){
+                            previewImg.src = src;
+                            previewImg.style.display = "block";
+                        }else{
+                            previewVideo.src = src;
+                            previewVideo.style.display = "block";
+                            previewVideo.play();
+                        }
+                        previewMask.style.display = "flex";
+                    }
+                })
+            }
+            closePreview.onclick = ()=>{
+                previewMask.style.display = "none";
+                previewVideo.pause();
+            };
+            previewMask.onclick = e=>{
+                if(e.target === previewMask){
+                    previewMask.style.display = "none";
+                    previewVideo.pause();
+                }
+            }
+            addTempBtn.onclick = ()=>{
+                const val = linkInput.value.trim();
+                if(!val) return alert("请输入链接");
+                tempList.push(val);
+                localStorage.setItem('tempWall', JSON.stringify(tempList));
+                linkInput.value = "";
+                renderWall();
+            }
+            exportBtn.onclick = ()=>{
+                const allUrl = [...fixedImages,...tempList];
+                const blob = new Blob([JSON.stringify(allUrl,null,2)],{type:"application/json"});
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = "壁纸链接.json";
+                a.click();
+                URL.revokeObjectURL(a.href);
+            }
+
+            // 音乐播放逻辑
+            const miniCover = document.getElementById('miniCover');
+            const miniName = document.getElementById('miniName');
+            const miniArtist = document.getElementById('miniArtist');
+            const progressBar = document.getElementById('progressBar');
+            const curTime = document.getElementById('curTime');
+            const totalTime = document.getElementById('totalTime');
+            const playBtn = document.getElementById('playBtn');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const progressWrap = document.getElementById('progressWrap');
+            const loopCheck = document.getElementById('loopCheck');
+            const songListBox = document.getElementById('songListBox');
+            function loadMusic(idx){
+                if(!musicList[idx]) return;
+                const s = musicList[idx];
+                audio.src = s.src || "#";
+                miniCover.src = s.cover || "https://via.placeholder.com/100";
+                miniName.textContent = s.name || "暂无歌曲";
+                miniArtist.textContent = s.artist || "未知歌手";
+                currentIndex = idx;
+                renderSongList();
+            }
+            function formatTime(s){
+                const m = Math.floor(s / 60);
+                const ss = Math.floor(s % 60);
+                return String(m).padStart(2,'0') + ":" + String(ss).padStart(2,'0');
+            }
+            audio.ontimeupdate = ()=>{
+                const p = audio.currentTime / audio.duration * 100;
+                progressBar.style.width = p + "%";
+                curTime.textContent = formatTime(audio.currentTime);
+            }
+            audio.onloadedmetadata = ()=> totalTime.textContent = formatTime(audio.duration);
+            audio.onended = ()=>{
+                if(isLoop){
+                    audio.currentTime = 0;
+                    audio.play();
+                }else{
+                    nextSong();
+                }
+            }
+            playBtn.onclick = ()=>{
+                if(audio.paused){
+                    audio.play();
+                    playBtn.textContent = "⏸";
+                }else{
+                    audio.pause();
+                    playBtn.textContent = "▶";
+                }
+            }
+            prevBtn.onclick = ()=>{
+                currentIndex = (currentIndex - 1 + musicList.length) % musicList.length;
+                loadMusic(currentIndex);
+                audio.play();
+                playBtn.textContent = "⏸";
+            }
+            function nextSong(){
+                currentIndex = (currentIndex + 1) % musicList.length;
+                loadMusic(currentIndex);
+                audio.play();
+                playBtn.textContent = "⏸";
+            }
+            nextBtn.onclick = nextSong;
+            progressWrap.onclick = e=>{
+                const rect = progressWrap.getBoundingClientRect();
+                const per = (e.clientX - rect.left) / rect.width;
+                audio.currentTime = per * audio.duration;
+            }
+            loopCheck.onchange = ()=> isLoop = loopCheck.checked;
+            function renderSongList(){
+                let html = "";
+                musicList.forEach((item,i)=>{
+                    html += `<div class="song-item" data-i="${i}">${item.name} - ${item.artist}</div>`;
+                })
+                songListBox.innerHTML = html;
+                document.querySelectorAll('.song-item').forEach(el=>{
+                    el.onclick = ()=>{
+                        const idx = Number(el.dataset.i);
+                        loadMusic(idx);
+                        audio.play();
+                        playBtn.textContent = "⏸";
+                    }
+                })
+            }
+
+            // 全局水波纹
+            document.querySelectorAll('.ripple-box').forEach(card=>{
+                card.addEventListener('click',function(e){
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const ripple = document.createElement('span');
+                    ripple.style.position = "absolute";
+                    ripple.style.borderRadius = "50%";
+                    ripple.style.background = "rgba(190,110,220,0.35)";
+                    ripple.style.pointerEvents = "none";
+                    ripple.style.width = ripple.style.height = Math.max(rect.width, rect.height) + "px";
+                    ripple.style.left = x + "px";
+                    ripple.style.top = y + "px";
+                    ripple.style.transform = "scale(0)";
+                    ripple.style.opacity = "0.7";
+                    ripple.style.animation = "rippleSpread 0.6s ease-out forwards";
+                    this.appendChild(ripple);
+                    setTimeout(()=>ripple.remove(),600);
+                })
+            })
+
+            // 导航切换
+            const navBtns = document.querySelectorAll('.nav-btn');
+            const modules = document.querySelectorAll('.module');
+            navBtns.forEach(btn=>{
+                btn.addEventListener('click',()=>{
+                    const targetId = btn.dataset.target;
+                    navBtns.forEach(b=>b.classList.remove('active'));
+                    modules.forEach(m=>m.classList.remove('show'));
+                    btn.classList.add('active');
+                    document.getElementById(targetId).classList.add('show');
+                })
+            })
+
+            // 页面初始化登录检测
+            checkLogin();
         }
-        // 临时添加素材
-        addTempBtn.onclick = () => {
-            const url = linkInput.value.trim();
-            if (!url) return alert("请输入图片/视频链接");
-            const type = getMediaType(url);
-            if (type === 'unknown') return alert("不支持的文件类型");
-            tempList.push({url, type});
-            localStorage.setItem('tempWall', JSON.stringify(tempList));
-            linkInput.value = "";
-            renderWall();
-            alert(`${type === 'image' ? '图片' : '视频'}临时添加成功，换设备失效`);
-        }
-        // 导出链接
-        exportBtn.onclick = () => {
-            const all = getAllImages().map(i => i.url);
-            const json = JSON.stringify(all, null, 2);
-            const blob = new Blob([json], {type:"application/json"});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = "全部壁纸链接.json";
-            a.click();
-            URL.revokeObjectURL(a.href);
-        }
-        // 初始化登录检测
-        checkLogin();
     </script>
 </body>
 </html>
