@@ -48,7 +48,7 @@
             justify-content: center;
             gap: 24px;
             margin-bottom: 3rem;
-            padding: 12px 16px;
+            padding: 12 16px;
             border-radius: 999px;
             background: rgba(255, 255, 255, 0.045);
             backdrop-filter: blur(20px);
@@ -81,7 +81,7 @@
             flex-direction: column;
             gap: 2rem;
         }
-        /* 欢迎卡片：禁止点击、无小手、无波纹，半透毛玻璃 */
+        /* 欢迎卡片：禁止点击、无小手、无波纹 */
         .user-card {
             background: rgba(255, 255, 255, 0.045);
             backdrop-filter: blur(22px);
@@ -118,17 +118,16 @@
             text-align: center;
             letter-spacing: 1px;
         }
-        /* 波纹动画移到CSS区，修复JS报错 */
+        /* 波纹动画 */
         @keyframes rippleSpread {
             to { transform: scale(2.5); opacity: 0; }
         }
-        /* 通用卡片波纹样式（仅非首页卡片生效） */
         .ripple-box {
             position: relative;
             overflow: hidden;
             cursor: pointer;
         }
-        /* 时间+音乐 左右50%并排容器 */
+        /* 时间+音乐并排 */
         .row-two-card {
             display: flex;
             gap: 2rem;
@@ -137,7 +136,6 @@
         .col-half {
             width: 50%;
         }
-        /* 时间卡片 高透明样式 */
         .time-card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
@@ -167,7 +165,6 @@
             color: #9aa2c2;
             margin-top: 6px;
         }
-        /* 首页音乐卡片 高透明样式 */
         .mini-music-card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
@@ -217,7 +214,7 @@
         .progress-wrap {
             width: 100%;
             height: 5px;
-            background: rgba(255,255,255,0.12);
+            background: rgba(255,255,0.12);
             border-radius: 99px;
             cursor: pointer;
             position: relative;
@@ -248,7 +245,6 @@
             font-size: 1.3rem;
             cursor: pointer;
         }
-        /* 音乐模块内部卡片 高透明 */
         .music-set-card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
@@ -267,7 +263,7 @@
         .song-item {
             padding: 12px 16px;
             border-radius: 12px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,0.05);
             margin-bottom: 10px;
             cursor: pointer;
             transition: 0.2s;
@@ -287,7 +283,6 @@
         .loop-box label {
             cursor: pointer;
         }
-        /* 模块切换样式（无弹窗，直接切换） */
         .module {
             display: none;
             animation: fadeIn 0.35s ease;
@@ -299,7 +294,6 @@
             from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        /* 工具/游戏卡片 高透明样式 */
         .tool-card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
@@ -560,7 +554,7 @@
             background: rgba(255, 255, 0.1);
             border-color: rgba(190, 110, 220, 0.25);
         }
-        /* AI对话模块样式 */
+        /* AI对话模块 */
         .ai-chat-card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
@@ -658,7 +652,7 @@
     </div>
     <div class="main-wrap" id="mainWrap">
         <div class="container">
-            <!-- 导航栏（新增AI对话按钮） -->
+            <!-- 导航栏 -->
             <div class="nav-bar">
                 <button class="nav-btn active" data-target="homeModule">首页</button>
                 <button class="nav-btn" data-target="wallModule">壁纸</button>
@@ -670,7 +664,7 @@
             <div class="logout-box">
                 <button id="logoutBtn">退出登录</button>
             </div>
-            <!-- 首页模块（默认显示） -->
+            <!-- 首页 -->
             <div class="module show" id="homeModule">
                 <div class="home-wrap">
                     <div class="user-card">
@@ -701,7 +695,7 @@
                                         <div class="music-artist" id="miniArtist">—</div>
                                     </div>
                                 </div>
-                                <div class="progress-wrap" id="progressWrap">
+                                <div class="progress-wrap" id="progressBarWrap">
                                     <div class="progress-bar" id="progressBar"></div>
                                 </div>
                                 <div class="music-time">
@@ -721,7 +715,7 @@
                     </div>
                 </div>
             </div>
-            <!-- 壁纸模块 -->
+            <!-- 壁纸 -->
             <div class="module" id="wallModule">
                 <div class="tool-bar">
                     <button class="tool-btn" id="exportBtn">导出全部链接JSON</button>
@@ -735,7 +729,7 @@
                 </div>
                 <div class="wall-grid" id="wallGrid"></div>
             </div>
-            <!-- 工具模块 -->
+            <!-- 工具 -->
             <div class="module" id="toolModule">
                 <div class="tool-card ripple-box">
                     <h3>极域工具包</h3>
@@ -748,7 +742,7 @@
                     <a class="download-exe" href="https://easylink.cc/11e6ix" target="_blank">前往工具箱</a>
                 </div>
             </div>
-            <!-- 游戏模块 -->
+            <!-- 游戏 -->
             <div class="module" id="gameModule">
                 <div class="tool-card ripple-box">
                     <h3>LMFP联机软件</h3>
@@ -771,7 +765,7 @@
                     <a class="download-exe" href="https://easylink.cc/zob528" target="_blank">前往游玩</a>
                 </div>
             </div>
-            <!-- 音乐模块 -->
+            <!-- 音乐 -->
             <div class="module" id="musicModule">
                 <div class="music-set-card ripple-box">
                     <h3>歌曲列表</h3>
@@ -782,7 +776,7 @@
                     </div>
                 </div>
             </div>
-            <!-- AI对话模块 -->
+            <!-- AI对话 -->
             <div class="module" id="aiChatModule">
                 <div class="ai-chat-card ripple-box">
                     <h3 style="text-align:center;margin-bottom:20px;color:#e2e8ff;">AI智能对话 · 支持图文识图</h3>
@@ -885,7 +879,6 @@
                 checkLogin();
             }
             loginBtn.onclick = doLogin;
-            loginBtn.addEventListener("click", doLogin);
             pwdInput.onkeydown = function(e){
                 if(e.key === "Enter") doLogin();
             };
@@ -897,7 +890,6 @@
             const previewVideo = document.getElementById('previewVideo');
             const closePreview = document.getElementById('closePreview');
             const exportBtn = document.getElementById('exportBtn');
-            const importFile = document.getElementById('import-file');
             const linkInput = document.getElementById('linkInput');
             const addTempBtn = document.getElementById('addTempBtn');
             let tempList = [];
@@ -978,13 +970,13 @@
             const miniCover = document.getElementById('miniCover');
             const miniName = document.getElementById('miniName');
             const miniArtist = document.getElementById('miniArtist');
+            const progressWrap = document.getElementById('progressBarWrap');
             const progressBar = document.getElementById('progressBar');
             const curTime = document.getElementById('curTime');
             const totalTime = document.getElementById('totalTime');
             const playBtn = document.getElementById('playBtn');
             const prevBtn = document.getElementById('prevBtn');
             const nextBtn = document.getElementById('nextBtn');
-            const progressWrap = document.getElementById('progressWrap');
             const loopCheck = document.getElementById('loopCheck');
             const songListBox = document.getElementById('songListBox');
             function loadMusic(idx){
@@ -1059,15 +1051,14 @@
                     }
                 })
             }
-            // ========== AI对话【修复removeChild报错完整版】 ==========
+            // AI对话 优化修复版
             const chatLog = document.getElementById("chatLog");
             const chatInput = document.getElementById("chatInput");
             const sendChatBtn = document.getElementById("sendChatBtn");
-            const uploadImgBtn = document.getElementById("uploadImgBtn");
+            const uploadImgBtn = document.getElementById("imgUploadInput");
             const imgUploadInput = document.getElementById("imgUploadInput");
             const previewImgBox = document.getElementById("previewImgBox");
             let loadingTipEl = null;
-
             uploadImgBtn.onclick = () => imgUploadInput.click();
             imgUploadInput.onchange = function(e){
                 const file = e.target.files[0];
@@ -1079,7 +1070,6 @@
                 }
                 reader.readAsDataURL(file);
             }
-
             function addChat(text, isUser){
                 const div = document.createElement("div");
                 div.className = "chat-item " + (isUser ? "user-text" : "ai-text");
@@ -1088,7 +1078,6 @@
                 chatLog.scrollTop = chatLog.scrollHeight;
                 return div;
             }
-
             async function sendAiMsg(){
                 const text = chatInput.value.trim();
                 if(!text && !uploadImageFile) {
@@ -1113,15 +1102,15 @@
                         });
                         const data = await res.json();
                         if(loadingTipEl && loadingTipEl.parentNode) loadingTipEl.remove();
-                        console.log("识图原始返回：",data);
+                        // 多层兼容判断，杜绝未知返回结构
                         if(data.error){
                             reply = "错误：" + data.error;
-                        }else if(data?.output?.text){
-                            reply = data.output.text;
-                        }else if(data?.choices?.[0]?.message?.content){
+                        }else if(data.choices && data.choices[0]?.message?.content){
                             reply = data.choices[0].message.content;
+                        }else if(data.output?.text){
+                            reply = data.output.text;
                         }else{
-                            reply = "未知返回结构："+JSON.stringify(data,null,1);
+                            reply = JSON.stringify(data, null, 2);
                         }
                         uploadImageFile = null;
                         previewImgBox.innerHTML = "";
@@ -1134,15 +1123,14 @@
                         });
                         const data = await res.json();
                         if(loadingTipEl && loadingTipEl.parentNode) loadingTipEl.remove();
-                        console.log("对话原始返回：",data);
                         if(data.error){
                             reply = "错误：" + data.error;
-                        }else if(data?.output?.text){
-                            reply = data.output.text;
-                        }else if(data?.choices?.[0]?.message?.content){
+                        }else if(data.choices && data.choices[0]?.message?.content){
                             reply = data.choices[0].message.content;
+                        }else if(data.output?.text){
+                            reply = data.output.text;
                         }else{
-                            reply = "未知返回结构："+JSON.stringify(data,null,1);
+                            reply = JSON.stringify(data, null, 2);
                         }
                         chatHistory.push({role:"assistant", content:reply});
                     }
@@ -1157,7 +1145,7 @@
             chatInput.onkeydown = e=>{
                 if(e.key === "Enter") sendAiMsg();
             }
-            // 全局水波纹
+            // 水波纹
             document.querySelectorAll('.ripple-box').forEach(card=>{
                 card.addEventListener('click',function(e){
                     const rect = this.getBoundingClientRect();
@@ -1195,6 +1183,3 @@
     </script>
 </body>
 </html>
-
-
-
