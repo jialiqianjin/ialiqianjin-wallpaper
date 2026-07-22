@@ -42,13 +42,13 @@
             z-index: 1;
             padding: 2rem 1.2rem;
         }
-        /* 导航栏 */
+        /* 顶端横向导航栏 */
         .nav-bar {
             display: flex;
             justify-content: center;
             gap: 24px;
             margin-bottom: 3rem;
-            padding: 12 16px;
+            padding: 12px 16px;
             border-radius: 999px;
             background: rgba(255, 255, 255, 0.045);
             backdrop-filter: blur(20px);
@@ -75,11 +75,13 @@
         .nav-btn:hover {
             background: rgba(255, 255, 255, 0.08);
         }
+        /* 首页整体布局 */
         .home-wrap {
             display: flex;
             flex-direction: column;
             gap: 2rem;
         }
+        /* 欢迎卡片：禁止点击、无小手、无波纹，半透毛玻璃 */
         .user-card {
             background: rgba(255, 255, 255, 0.045);
             backdrop-filter: blur(22px);
@@ -116,14 +118,17 @@
             text-align: center;
             letter-spacing: 1px;
         }
+        /* 波纹动画移到CSS区，修复JS报错 */
         @keyframes rippleSpread {
             to { transform: scale(2.5); opacity: 0; }
         }
+        /* 通用卡片波纹样式（仅非首页卡片生效） */
         .ripple-box {
             position: relative;
             overflow: hidden;
             cursor: pointer;
         }
+        /* 时间+音乐 左右50%并排容器 */
         .row-two-card {
             display: flex;
             gap: 2rem;
@@ -132,11 +137,12 @@
         .col-half {
             width: 50%;
         }
+        /* 时间卡片 高透明样式 */
         .time-card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 0.06);
             border-radius: 24px;
             padding: 24px;
             display: flex;
@@ -161,6 +167,7 @@
             color: #9aa2c2;
             margin-top: 6px;
         }
+        /* 首页音乐卡片 高透明样式 */
         .mini-music-card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
@@ -241,6 +248,7 @@
             font-size: 1.3rem;
             cursor: pointer;
         }
+        /* 音乐模块内部卡片 高透明 */
         .music-set-card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
@@ -259,7 +267,7 @@
         .song-item {
             padding: 12px 16px;
             border-radius: 12px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,0.05);
             margin-bottom: 10px;
             cursor: pointer;
             transition: 0.2s;
@@ -279,6 +287,7 @@
         .loop-box label {
             cursor: pointer;
         }
+        /* 模块切换样式（无弹窗，直接切换） */
         .module {
             display: none;
             animation: fadeIn 0.35s ease;
@@ -290,6 +299,7 @@
             from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        /* 工具/游戏卡片 高透明样式 */
         .tool-card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
@@ -451,7 +461,7 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
+            width 100vw;
             height: 100vh;
             background: rgba(10, 11, 20, 0.95);
             z-index: 999;
@@ -540,7 +550,7 @@
         #logoutBtn {
             padding: 8px 20px;
             background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 0.12);
             border-radius: 8px;
             color: #c5cceb;
             cursor: pointer;
@@ -550,7 +560,7 @@
             background: rgba(255, 255, 255, 0.1);
             border-color: rgba(190, 110, 220, 0.25);
         }
-        /* AI对话样式 */
+        /* AI对话模块样式 */
         .ai-chat-card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
@@ -588,7 +598,7 @@
             flex:1;
             padding:14px 18px;
             border-radius:12px;
-            border:1px solid rgba(255,255,0.12);
+            border:1px solid rgba(255,255,255,0.12);
             background:rgba(0,0,0,0.18);
             color:#e0e4ff;
             outline:none;
@@ -615,7 +625,7 @@
             border-radius: 8px;
             margin: 6px 0;
         }
-        /* 移动端 */
+        /* 移动端适配 */
         @media (max-width:768px) {
             .row-two-card {
                 flex-direction: column;
@@ -648,6 +658,7 @@
     </div>
     <div class="main-wrap" id="mainWrap">
         <div class="container">
+            <!-- 导航栏（新增AI对话按钮） -->
             <div class="nav-bar">
                 <button class="nav-btn active" data-target="homeModule">首页</button>
                 <button class="nav-btn" data-target="wallModule">壁纸</button>
@@ -659,12 +670,12 @@
             <div class="logout-box">
                 <button id="logoutBtn">退出登录</button>
             </div>
-            <!-- 首页 -->
+            <!-- 首页模块（默认显示） -->
             <div class="module show" id="homeModule">
                 <div class="home-wrap">
                     <div class="user-card">
                         <div class="avatar">
-                            <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEWbU5qRMgEVWpbgKvp-9X8Q9clpY7pOQAC1i0AAgNwKVY7gGNL3x6WEzwE.jpg" alt="头像">
+                            <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEWbU5qRMgEVWpbgKvp-9X8Q9clpY7pOQAC1i0AAgNwKVY7gGNL3x6WEzwE.jpg" alt="个人头像">
                         </div>
                         <div class="greeting">
                             <h2>欢迎回来，加力前进</h2>
@@ -683,7 +694,7 @@
                             <div class="mini-music-card ripple-box">
                                 <div class="music-top">
                                     <div class="music-cover">
-                                        <img id="miniCover" src="" alt="封面">
+                                        <img id="miniCover" src="" alt="歌曲封面">
                                     </div>
                                     <div class="music-info">
                                         <div class="music-name" id="miniName">暂无歌曲</div>
@@ -710,21 +721,21 @@
                     </div>
                 </div>
             </div>
-            <!-- 壁纸 -->
+            <!-- 壁纸模块 -->
             <div class="module" id="wallModule">
                 <div class="tool-bar">
                     <button class="tool-btn" id="exportBtn">导出全部链接JSON</button>
                     <input type="file" id="import-file" accept=".json">
                 </div>
                 <div class="add-link-box ripple-box">
-                    <input id="linkInput" placeholder="临时添加图片/视频（换设备消失）">
+                    <input id="linkInput" placeholder="临时添加图片/视频（换设备消失，永久需写进代码）">
                     <br>
                     <button id="addTempBtn">临时添加（本地缓存）</button>
-                    <p style="color:#868fb0;margin-top:8px;font-size:13px;">⚠️ 永久使用需要写入代码</p>
+                    <p style="color:#868fb0;margin-top:8px;font-size:13px;">⚠️ 想要换设备也显示，必须把链接加到fixedImages数组，重新上传页面</p>
                 </div>
                 <div class="wall-grid" id="wallGrid"></div>
             </div>
-            <!-- 工具 -->
+            <!-- 工具模块 -->
             <div class="module" id="toolModule">
                 <div class="tool-card ripple-box">
                     <h3>极域工具包</h3>
@@ -737,7 +748,7 @@
                     <a class="download-exe" href="https://easylink.cc/11e6ix" target="_blank">前往工具箱</a>
                 </div>
             </div>
-            <!-- 游戏 -->
+            <!-- 游戏模块 -->
             <div class="module" id="gameModule">
                 <div class="tool-card ripple-box">
                     <h3>LMFP联机软件</h3>
@@ -760,7 +771,7 @@
                     <a class="download-exe" href="https://easylink.cc/zob528" target="_blank">前往游玩</a>
                 </div>
             </div>
-            <!-- 音乐 -->
+            <!-- 音乐模块 -->
             <div class="module" id="musicModule">
                 <div class="music-set-card ripple-box">
                     <h3>歌曲列表</h3>
@@ -771,7 +782,7 @@
                     </div>
                 </div>
             </div>
-            <!-- AI对话模块 -->
+            <!-- AI对话模块（带图片上传） -->
             <div class="module" id="aiChatModule">
                 <div class="ai-chat-card ripple-box">
                     <h3 style="text-align:center;margin-bottom:20px;color:#e2e8ff;">AI智能对话 · 支持图文识图</h3>
@@ -795,381 +806,398 @@
         <img id="previewImg" style="display:none;">
         <video id="previewVideo" controls style="display:none;"></video>
     </div>
-<script>
-window.onerror = function(msg,src,line){
-    console.error("JS异常：",msg,src,line);
-    const tipDom = document.getElementById("loginTip");
-    if(tipDom) tip.textContent = "脚本异常："+msg;
-};
-window.onload = function(){
-    const ACCESS_PASSWORD = "a12345678945";
-    const LOGIN_STORAGE_KEY = "wallLoginAuth";
-    // 接口配置
-    const API_BASE = "https://api-dc6d38b3.fastapicloud.dev";
-    const API_TOKEN = "a12345678945";
-    let chatHistory = [];
-    let uploadImageFile = null;
-    const musicList = [
-        {name: "歌曲名称1",artist: "歌手名",cover: "https://via.placeholder.com/100",src: "#"},
-        {name: "歌曲名称2",artist: "歌手名",cover: "https://via.placeholder.com/100",src: "#"}
-    ];
-    let currentIndex = 0;
-    let isLoop = false;
-    const audio = new Audio();
-    const fixedImages = [
-        "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVse9qM3ZwqHjkQCkkZS2xCvMavSz70QACFiMAAoLBoVXyysCgPKPgXTwE.jpg",
-        "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVsgRqM3jGTgnr3syb7ztuclcHt35fSgACMCMAAoLBoVXG6YvfK6qc6TwE.png",
-        "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVsjFqM30AAXyA1uSlDvi_HxgRK_BoRM0AAnQjAAKCwaFVfapo5nroNFs8BA.png",
-        "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVwBdqNM_f6WSiZ9ZqyWp99HA1qvkP9gACmyAAAmzbqFXqtxyKJyeGUjwE.png",
-        "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEV0RJqN4aVBGoLRDwwc4cAAR-bnhWz37EAAs4jAALn07lVJaP7ROcLZDw8BA.png",
-        "https://cropgif.net/videos/1782022932124-66a03516-a7e6-4d51-adc9-ab4ae0923174.mp4",
-        "https://cropgif.net/videos/1782023395596-f40b26d1-fcf6-4a84-bb91-19fcdcfdd61f.mp4"
-    ];
-    // 时间
-    function updateTime(){
-        const now = new Date();
-        const h = String(now.getHours()).padStart(2,'0');
-        const m = String(now.getMinutes()).padStart(2,'0');
-        const week = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
-        document.getElementById('timeText').textContent = `${h}:${m}`;
-        document.getElementById('dateText').textContent = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${week[now.getDay()]}`;
-    }
-    updateTime();
-    setInterval(updateTime, 1000);
-    // 登录
-    const loginMask = document.getElementById("loginMask");
-    const mainWrap = document.getElementById("mainWrap");
-    const pwdInput = document.getElementById("pwdInput");
-    const loginBtn = document.getElementById("loginBtn");
-    const loginTip = document.getElementById("loginTip");
-    const logoutBtn = document.getElementById("logoutBtn");
-    function checkLogin(){
-        try{
-            if(localStorage.getItem(LOGIN_STORAGE_KEY) === "ok"){
-                loginMask.style.display = "none";
-                mainWrap.style.display = "block";
-                renderWall();
-                renderSongList();
-            }else{
-                loginMask.style.display = "flex";
-                mainWrap.style.display = "none";
+    <script>
+        // 全局异常捕获，防止JS卡死阻断登录
+        window.onerror = function(msg,src,line){
+            console.error("JS异常：",msg,src,line);
+            const tipDom = document.getElementById("loginTip");
+            if(tipDom) tip.textContent = "脚本异常："+msg;
+        };
+        // 页面加载完成后再执行所有逻辑，避免DOM未加载绑定失败
+        window.onload = function(){
+            const ACCESS_PASSWORD = "a12345678945";
+            const LOGIN_STORAGE_KEY = "wallLoginAuth";
+            // AI接口配置（已填好）
+            const API_BASE = "https://api-dc6d38b3.fastapicloud.dev";
+            const API_TOKEN = "a12345678945";
+            let chatHistory = [];
+            let uploadImageFile = null;
+            const musicList = [
+                {name: "歌曲名称1",artist: "歌手名",cover: "https://via.placeholder.com/100",src: "#"},
+                {name: "歌曲名称2",artist: "歌手名",cover: "https://via.placeholder.com/100",src: "#"}
+            ];
+            let currentIndex = 0;
+            let isLoop = false;
+            const audio = new Audio();
+            const fixedImages = [
+                "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVse9qM3ZwqHjkQCkkZS2xCvMavSz70QACFiMAAoLBoVXyysCgPKPgXTwE.jpg",
+                "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVsgRqM3jGTgnr3syb7ztuclcHt35fSgACMCMAAoLBoVXG6YvfK6qc6TwE.png",
+                "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVsjFqM30AAXyA1uSlDvi_HxgRK_BoRM0AAnQjAAKCwaFVfapo5nroNFs8BA.png",
+                "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVwBdqNM_f6WSiZ9ZqyWp99HA1qvkP9gACmyAAAmzbqFXqtxyKJyeGUjwE.png",
+                "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEV0RJqN4aVBGoLRDwwc4cAAR-bnhWz37EAAs4jAALn07lVJaP7ROcLZDw8BA.png",
+                "https://cropgif.net/videos/1782022932124-66a03516-a7e6-4d51-adc9-ab4ae0923174.mp4",
+                "https://cropgif.net/videos/1782023395596-f40b26d1-fcf6-4a84-bb91-19fcdcfdd61f.mp4"
+            ];
+            // 时间更新
+            function updateTime(){
+                const now = new Date();
+                const h = String(now.getHours()).padStart(2,'0');
+                const m = String(now.getMinutes()).padStart(2,'0');
+                const week = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+                document.getElementById('timeText').textContent = `${h}:${m}`;
+                document.getElementById('dateText').textContent = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${week[now.getDay()]}`;
             }
-        }catch(e){
-            loginTip.textContent = "本地存储异常，请清除缓存重试";
-        }
-    }
-    function doLogin(){
-        loginTip.textContent = "";
-        const inputPwd = pwdInput.value.trim();
-        if(inputPwd !== ACCESS_PASSWORD){
-            loginTip.textContent = "密码错误，请重新输入";
-            pwd.value = "";
-            return;
-        }
-        localStorage.setItem(LOGIN_STORAGE_KEY, "ok");
-        checkLogin();
-    }
-    function doLogout(){
-        localStorage.removeItem(LOGIN_STORAGE_KEY);
-        checkLogin();
-    }
-    loginBtn.onclick = doLogin;
-    loginBtn.addEventListener("click", doLogin);
-    pwdInput.onkeydown = function(e){
-        if(e.key === "Enter") doLogin();
-    };
-    logoutBtn.onclick = doLogout;
-    // 壁纸
-    const wallGrid = document.getElementById('wallGrid');
-    const previewMask = document.getElementById('previewMask');
-    const previewImg = document.getElementById('previewImg');
-    const previewVideo = document.getElementById('previewVideo');
-    const closePreview = document.getElementById('closePreview');
-    const exportBtn = document.getElementById('exportBtn');
-    const importFile = document.getElementById('import-file');
-    const linkInput = document.getElementById('linkInput');
-    const addTempBtn = document.getElementById('addTempBtn');
-    let tempList = [];
-    try{
-        tempList = JSON.parse(localStorage.getItem('tempWall')) || [];
-    }catch(err){tempList = [];}
-    function getMediaType(url){
-        const ext = url.split('.').pop().toLowerCase();
-        return ['jpg','jpeg','png','gif','webp','bmp'].includes(ext) ? "img" : "video";
-    }
-    function renderWall(){
-        const all = [...fixedImages,...tempList];
-        if(all.length === 0){
-            wallGrid.innerHTML = '<div class="empty">暂无壁纸资源</div>';
-            return;
-        }
-        let html = "";
-        all.forEach(u=>{
-            const t = getMediaType(u);
-            if(t === "img"){
-                html += `<div class="wall-card ripple-box"><img class="preview-item" data-src="${u}" src="${u}"><div class="card-action"><a class="down-btn" target="_blank" href="${u}">下载原图</a></div></div>`;
-            }else{
-                html += `<div class="wall-card ripple-box"><video muted loop preload="metadata" class="preview-item" data-src="${u}"><source src="${u}"></video><div class="card-action"><a class="down-btn" target="_blank" href="${u}">下载视频</a></div></div>`;
-            }
-        });
-        wallGrid.innerHTML = html;
-        bindPreview();
-    }
-    function bindPreview(){
-        document.querySelectorAll('.preview-item').forEach(el=>{
-            el.onclick = function(){
-                const src = this.dataset.src;
-                const t = getMediaType(src);
-                previewImg.style.display = "none";
-                previewVideo.style.display = "none";
-                if(t === "img"){
-                    previewImg.src = src;
-                    previewImg.style.display = "block";
-                }else{
-                    previewVideo.src = src;
-                    previewVideo.style.display = "block";
-                    previewVideo.play();
+            updateTime();
+            setInterval(updateTime, 1000);
+            // 登录核心逻辑
+            const loginMask = document.getElementById("loginMask");
+            const mainWrap = document.getElementById("mainWrap");
+            const pwdInput = document.getElementById("pwdInput");
+            const loginBtn = document.getElementById("loginBtn");
+            const loginTip = document.getElementById("loginTip");
+            const logoutBtn = document.getElementById("logoutBtn");
+            function checkLogin(){
+                try{
+                    if(localStorage.getItem(LOGIN_STORAGE_KEY) === "ok"){
+                        loginMask.style.display = "none";
+                        mainWrap.style.display = "block";
+                        renderWall();
+                        renderSongList();
+                    }else{
+                        loginMask.style.display = "flex";
+                        mainWrap.style.display = "none";
+                    }
+                }catch(e){
+                    loginTip.textContent = "本地存储异常，请清除缓存重试";
                 }
-                previewMask.style.display = "flex";
             }
-        })
-    }
-    closePreview.onclick = ()=>{
-        previewMask.style.display = "none";
-        previewVideo.pause();
-    };
-    previewMask.onclick = e=>{
-        if(e.target === previewMask){
-            previewMask.style.display = "none";
-            previewVideo.pause();
-        }
-    }
-    addTempBtn.onclick = ()=>{
-        const val = linkInput.value.trim();
-        if(!val) return alert("请输入链接");
-        tempList.push(val);
-        localStorage.setItem('tempWall', JSON.stringify(tempList));
-        linkInput.value = "";
-        renderWall();
-    }
-    exportBtn.onclick = ()=>{
-        const allUrl = [...fixedImages,...tempList];
-        const blob = new Blob([JSON.stringify(allUrl,null,2)],{type:"application/json"});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = "壁纸链接.json";
-        a.click();
-        URL.revokeObjectURL(a.href);
-    }
-    // 音乐
-    const miniCover = document.getElementById('miniCover');
-    const miniName = document.getElementById('miniName');
-    const miniArtist = document.getElementById('miniArtist');
-    const progressBar = document.getElementById('progressBar');
-    const curTime = document.getElementById('curTime');
-    const totalTime = document.getElementById('totalTime');
-    const playBtn = document.getElementById('playBtn');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const progressWrap = document.getElementById('progressWrap');
-    const loopCheck = document.getElementById('loopCheck');
-    const songListBox = document.getElementById('songListBox');
-    function loadMusic(idx){
-        if(!musicList[idx]) return;
-        const s = musicList[idx];
-        audio.src = s.src || "#";
-        miniCover.src = s.cover || "https://via.placeholder.com/100";
-        miniName.textContent = s.name || "暂无歌曲";
-        miniArtist.textContent = s.artist || "未知歌手";
-        currentIndex = idx;
-        renderSongList();
-    }
-    function formatTime(s){
-        const m = Math.floor(s / 60);
-        const ss = Math.floor(s % 60);
-        return String(m).padStart(2,'0') + ":" + String(ss).padStart(2,'0');
-    }
-    audio.ontimeupdate = ()=>{
-        const p = audio.currentTime / audio.duration * 100;
-        progressBar.style.width = p + "%";
-        curTime.textContent = formatTime(audio.currentTime);
-    }
-    audio.onloadedmetadata = ()=> totalTime.textContent = formatTime(audio.duration);
-    audio.onended = ()=>{
-        if(isLoop){
-            audio.currentTime = 0;
-            audio.play();
-        }else{
-            nextSong();
-        }
-    }
-    playBtn.onclick = ()=>{
-        if(audio.paused){
-            audio.play();
-            playBtn.textContent = "⏸";
-        }else{
-            audio.pause();
-            playBtn.textContent = "▶";
-        }
-    }
-    prevBtn.onclick = ()=>{
-        currentIndex = (currentIndex - 1 + musicList.length) % musicList.length;
-        loadMusic(currentIndex);
-        audio.play();
-        playBtn.textContent = "⏸";
-    }
-    function nextSong(){
-        currentIndex = (currentIndex + 1) % musicList.length;
-        loadMusic(currentIndex);
-        audio.play();
-        playBtn.textContent = "⏸";
-    }
-    nextBtn.onclick = nextSong;
-    progressWrap.onclick = e=>{
-        const rect = progressWrap.getBoundingClientRect();
-        const per = (e.clientX - rect.left) / rect.width;
-        audio.currentTime = per * audio.duration;
-    }
-    loopCheck.onchange = ()=> isLoop = loopCheck.checked;
-    function renderSongList(){
-        let html = "";
-        music.forEach((item,i)=>{
-            html += `<div class="song-item" data-i="${i}">${item.name} - ${item.artist}</div>`;
-        })
-        songListBox.innerHTML = html;
-        document.querySelectorAll('.song-item').forEach(el=>{
-            el.onclick = ()=>{
-                const idx = Number(el.dataset.i);
-                loadMusic(idx);
+            function doLogin(){
+                loginTip.textContent = "";
+                const inputPwd = pwdInput.value.trim();
+                if(inputPwd !== ACCESS_PASSWORD){
+                    loginTip.textContent = "密码错误，请重新输入";
+                    pwdInput.value = "";
+                    return;
+                }
+                localStorage.setItem(LOGIN_STORAGE_KEY, "ok");
+                checkLogin();
+            }
+            function doLogout(){
+                localStorage.removeItem(LOGIN_STORAGE_KEY);
+                checkLogin();
+            }
+            loginBtn.onclick = doLogin;
+            loginBtn.addEventListener("click", doLogin);
+            pwdInput.onkeydown = function(e){
+                if(e.key === "Enter") doLogin();
+            };
+            logoutBtn.onclick = doLogout;
+            // 壁纸渲染
+            const wallGrid = document.getElementById('wallGrid');
+            const previewMask = document.getElementById('previewMask');
+            const previewImg = document.getElementById('previewImg');
+            const previewVideo = document.getElementById('previewVideo');
+            const closePreview = document.getElementById('closePreview');
+            const exportBtn = document.getElementById('exportBtn');
+            const importFile = document.getElementById('import-file');
+            const linkInput = document.getElementById('linkInput');
+            const addTempBtn = document.getElementById('addTempBtn');
+            let tempList = [];
+            try{
+                tempList = JSON.parse(localStorage.getItem('tempWall')) || [];
+            }catch(err){
+                tempList = [];
+            }
+            function getMediaType(url){
+                const ext = url.split('.').pop().toLowerCase();
+                return ['jpg','jpeg','png','gif','webp','bmp'].includes(ext) ? "img" : "video";
+            }
+            function renderWall(){
+                const all = [...fixedImages,...tempList];
+                if(all.length === 0){
+                    wallGrid.innerHTML = '<div class="empty">暂无壁纸资源</div>';
+                    return;
+                }
+                let html = "";
+                all.forEach(u=>{
+                    const t = getMediaType(u);
+                    if(t === "img"){
+                        html += `<div class="wall-card ripple-box"><img class="preview-item" data-src="${u}" src="${u}"><div class="card-action"><a class="down-btn" target="_blank" href="${u}">下载原图</a></div></div>`;
+                    }else{
+                        html += `<div class="wall-card ripple-box"><video muted loop preload="metadata" class="preview-item" data-src="${u}"><source src="${u}"></video><div class="card-action"><a class="down-btn" target="_blank" href="${u}">下载视频</a></div></div>`;
+                    }
+                });
+                wallGrid.innerHTML = html;
+                bindPreview();
+            }
+            function bindPreview(){
+                document.querySelectorAll('.preview-item').forEach(el=>{
+                    el.onclick = function(){
+                        const src = this.dataset.src;
+                        const t = getMediaType(src);
+                        previewImg.style.display = "none";
+                        previewVideo.style.display = "none";
+                        if(t === "img"){
+                            previewImg.src = src;
+                            previewImg.style.display = "block";
+                        }else{
+                            previewVideo.src = src;
+                            previewVideo.style.display = "block";
+                            previewVideo.play();
+                        }
+                        previewMask.style.display = "flex";
+                    }
+                })
+            }
+            closePreview.onclick = ()=>{
+                previewMask.style.display = "none";
+                previewVideo.pause();
+            };
+            previewMask.onclick = e=>{
+                if(e.target === previewMask){
+                    previewMask.style.display = "none";
+                    previewVideo.pause();
+                }
+            }
+            addTempBtn.onclick = ()=>{
+                const val = linkInput.value.trim();
+                if(!val) return alert("请输入链接");
+                tempList.push(val);
+                localStorage.setItem('tempWall', JSON.stringify(tempList));
+                linkInput.value = "";
+                renderWall();
+            }
+            exportBtn.onclick = ()=>{
+                const allUrl = [...fixedImages,...tempList];
+                const blob = new Blob([JSON.stringify(allUrl,null,2)],{type:"application/json"});
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = "壁纸链接.json";
+                a.click();
+                URL.revokeObjectURL(a.href);
+            }
+            // 音乐播放逻辑
+            const miniCover = document.getElementById('miniCover');
+            const miniName = document.getElementById('miniName');
+            const miniArtist = document.getElementById('miniArtist');
+            const progressBar = document.getElementById('progressBar');
+            const curTime = document.getElementById('curTime');
+            const totalTime = document.getElementById('totalTime');
+            const playBtn = document.getElementById('playBtn');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const progressWrap = document.getElementById('progressWrap');
+            const loopCheck = document.getElementById('loopCheck');
+            const songListBox = document.getElementById('songListBox');
+            function loadMusic(idx){
+                if(!musicList[idx]) return;
+                const s = musicList[idx];
+                audio.src = s.src || "#";
+                miniCover.src = s.cover || "https://via.placeholder.com/100";
+                miniName.textContent = s.name || "暂无歌曲";
+                miniArtist.textContent = s.artist || "未知歌手";
+                currentIndex = idx;
+                renderSongList();
+            }
+            function formatTime(s){
+                const m = Math.floor(s / 60);
+                const ss = Math.floor(s % 60);
+                return String(m).padStart(2,'0') + ":" + String(ss).padStart(2,'0');
+            }
+            audio.ontimeupdate = ()=>{
+                const p = audio.currentTime / audio.duration * 100;
+                progressBar.style.width = p + "%";
+                curTime.textContent = formatTime(audio.currentTime);
+            }
+            audio.onloadedmetadata = ()=> totalTime.textContent = formatTime(audio.duration);
+            audio.onended = ()=>{
+                if(isLoop){
+                    audio.currentTime = 0;
+                    audio.play();
+                }else{
+                    nextSong();
+                }
+            }
+            playBtn.onclick = ()=>{
+                if(audio.paused){
+                    audio.play();
+                    playBtn.textContent = "⏸";
+                }else{
+                    audio.pause();
+                    playBtn.textContent = "▶";
+                }
+            }
+            prevBtn.onclick = ()=>{
+                currentIndex = (currentIndex - 1 + musicList.length) % musicList.length;
+                loadMusic(currentIndex);
                 audio.play();
                 playBtn.textContent = "⏸";
             }
-        })
-    }
-    // AI聊天 修复格式兼容核心代码
-    const chatLog = document.getElementById("chatLog");
-    const chatInput = document.getElementById("chatInput");
-    const sendChatBtn = document.getElementById("sendChatBtn");
-    const uploadImgBtn = document.getElementById("uploadImgBtn");
-    const imgUploadInput = document.getElementById("imgUploadInput");
-    const previewImgBox = document.getElementById("previewImgBox");
-    uploadImgBtn.onclick = () => imgUploadInput.click();
-    imgUploadInput.onchange = function(e){
-        const file = e.target.files[0];
-        if(!file) return;
-        uploadImageFile = file;
-        const reader = new FileReader();
-        reader.onload = ev => {
-            previewImgBox.innerHTML = `<img class="preview-img-small" src="${ev.target.result}">`;
-        }
-        reader.readAsDataURL(file);
-    }
-    function addChat(text, isUser){
-        const div = document.createElement("div");
-        div.className = "chat-item " + (isUser ? "user-text" : "ai-text");
-        div.innerHTML = isUser ? `<b>你：</b>${text}` : `<b>AI：</b>${text}`;
-        chatLog.appendChild(div);
-        chatLog.scrollTop = chatLog.scrollHeight;
-    }
-    async function sendAiMsg(){
-        const text = chatInput.value.trim();
-        if(!text && !uploadImageFile) return alert("请输入提问或上传图片");
-        if(text) addChat(text, true);
-        chatInput.value = "";
-        addChat("请求处理中，请稍候...", false);
-        try{
-            let reply = "";
-            if(uploadImageFile){
-                const formData = new FormData();
-                formData.append("token", API_TOKEN);
-                formData.append("prompt", text);
-                formData.append("image", uploadImageFile);
-                const res = await fetch(`${API_BASE}/image_chat`,{
-                    method:"POST",
-                    body: formData
-                });
-                const data = await res.json();
-                chatLog.removeChild(chatLog.lastChild);
-                // 多格式兼容
-                if(data.error){
-                    reply = "错误：" + data.error;
-                }else if(data?.choices?.[0]?.message?.content){
-                    reply = data.choices[0].message.content;
-                }else if(data?.output?.text){
-                    reply = data.output.text;
-                }else{
-                    console.log("识图原始返回：",data);
-                    reply = "返回格式异常，控制台查看原始数据";
-                }
-                uploadImageFile = null;
-                previewImgBox.innerHTML = "";
-            }else{
-                chatHistory.push({role:"user", content:text});
-                const res = await fetch(`${API_BASE}/v1/chat/completions`,{
-                    method:"POST",
-                    headers:{"Content-Type":"application/json"},
-                    body:JSON.stringify({token: API_TOKEN, messages: chatHistory})
-                });
-                const data = await res.json();
-                chatLog.removeChild(chatLog.lastChild);
-                if(data.error){
-                    reply = "错误：" + data.error;
-                }else if(data?.choices?.[0]?.message?.content){
-                    reply = data.choices[0].message.content;
-                }else if(data?.output?.text){
-                    reply = data.output.text;
-                }else{
-                    console.log("对话原始返回：",data);
-                    reply = "返回格式异常，控制台查看原始数据";
-                }
-                chatHistory.push({role:"assistant", content:reply});
+            function nextSong(){
+                currentIndex = (currentIndex + 1) % musicList.length;
+                loadMusic(currentIndex);
+                audio.play();
+                playBtn.textContent = "⏸";
             }
-            addChat(reply, false);
-        }catch(err){
-            chatLog.removeChild(chatLog.lastChild);
-            addChat("网络请求失败："+err.message, false);
+            nextBtn.onclick = nextSong;
+            progressWrap.onclick = e=>{
+                const rect = progressWrap.getBoundingClientRect();
+                const per = (e.clientX - rect.left) / rect.width;
+                audio.currentTime = per * audio.duration;
+            }
+            loopCheck.onchange = ()=> isLoop = loopCheck.checked;
+            function renderSongList(){
+                let html = "";
+                musicList.forEach((item,i)=>{
+                    html += `<div class="song-item" data-i="${i}">${item.name} - ${item.artist}</div>`;
+                })
+                songListBox.innerHTML = html;
+                document.querySelectorAll('.song-item').forEach(el=>{
+                    el.onclick = ()=>{
+                        const idx = Number(el.dataset.i);
+                        loadMusic(idx);
+                        audio.play();
+                        playBtn.textContent = "⏸";
+                    }
+                })
+            }
+            // AI对话 + 图片上传逻辑【修复兼容版】
+            const chatLog = document.getElementById("chatLog");
+            const chatInput = document.getElementById("chatInput");
+            const sendChatBtn = document.getElementById("sendChatBtn");
+            const uploadImgBtn = document.getElementById("uploadImgBtn");
+            const imgUploadInput = document.getElementById("imgUploadInput");
+            const previewImgBox = document.getElementById("previewImgBox");
+            // 选择图片
+            uploadImgBtn.onclick = () => imgUploadInput.click();
+            imgUploadInput.onchange = function(e){
+                const file = e.target.files[0];
+                if(!file) return;
+                uploadImageFile = file;
+                // 预览
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    previewImgBox.innerHTML = `<img class="preview-img-small" src="${ev.target.result}">`;
+                }
+                reader.readAsDataURL(file);
+            }
+            // 追加聊天内容
+            function addChat(text, isUser){
+                const div = document.createElement("div");
+                div.className = "chat-item " + (isUser ? "user-text" : "ai-text");
+                div.innerHTML = isUser ? `<b>你：</b>${text}` : `<b>AI：</b>${text}`;
+                chatLog.appendChild(div);
+                chatLog.scrollTop = chatLog.scrollHeight;
+            }
+            // 发送消息【多层兼容修复函数】
+            async function sendAiMsg(){
+                const text = chatInput.value.trim();
+                if(!text && !uploadImageFile) return alert("请输入提问或上传图片");
+                if(text){
+                    addChat(text, true);
+                }
+                chatInput.value = "";
+                addChat("请求处理中，请稍候...", false);
+                try{
+                    let reply = "";
+                    // 有图片 → 调用识图接口
+                    if(uploadImageFile){
+                        const formData = new FormData();
+                        formData.append("token", API_TOKEN);
+                        formData.append("prompt", text);
+                        formData.append("image", uploadImageFile);
+                        const res = await fetch(`${API_BASE}/image_chat`,{
+                            method:"POST",
+                            body: formData
+                        });
+                        const data = await res.json();
+                        chatLog.removeChild(chatLog.lastChild);
+                        console.log("识图原始返回：",data);
+                        if(data.error){
+                            reply = "错误：" + data.error;
+                        }else if(data?.output?.text){
+                            reply = data.output.text;
+                        }else if(data?.choices?.[0]?.message?.content){
+                            reply = data.choices[0].message.content;
+                        }else{
+                            reply = "未知返回结构："+JSON.stringify(data,null,1);
+                        }
+                        // 清空图片缓存
+                        uploadImageFile = null;
+                        previewImgBox.innerHTML = "";
+                    }else{
+                        // 纯文字对话
+                        chatHistory.push({role:"user", content:text});
+                        const res = await fetch(`${API_BASE}/v1/chat/completions`,{
+                            method:"POST",
+                            headers:{"Content-Type":"application/json"},
+                            body:JSON.stringify({
+                                token: API_TOKEN,
+                                messages: chatHistory
+                            })
+                        });
+                        const data = await res.json();
+                        chatLog.removeChild(chatLog);
+                        console.log("对话原始返回：",data);
+                        if(data.error){
+                            reply = "错误：" + data.error;
+                        }else if(data?.output?.text){
+                            reply = data.output.text;
+                        }else if(data?.choices?.[0]?.message?.content){
+                            reply = data.choices[0].message.content;
+                        }else{
+                            reply = "未知返回结构："+JSON.stringify(data,null,1);
+                        }
+                        chatHistory.push({role:"assistant", content:reply});
+                    }
+                    addChat(reply, false);
+                }catch(err){
+                    chatLog.removeChild(chatLog.lastChild);
+                    addChat("网络请求失败：" + err.message, false);
+                }
+            }
+            sendChatBtn.onclick = sendAiMsg;
+            chatInput.onkeydown = e=>{
+                if(e.key === "Enter") sendAiMsg();
+            }
+            // 全局水波纹
+            document.querySelectorAll('.ripple-box').forEach(card=>{
+                card.addEventListener('click',function(e){
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const ripple = document.createElement('span');
+                    ripple.style.position = "absolute";
+                    ripple.style.borderRadius = "50%";
+                    ripple.style.background = "rgba(190,110,220,0.35)";
+                    ripple.style.pointerEvents = "none";
+                    ripple.style.width = ripple.style.height = Math.max(rect.width, rect.height) + "px";
+                    ripple.style.left = x + "px";
+                    ripple.style.top = y + "px";
+                    ripple.style.transform = "scale(0)";
+                    ripple.style.opacity = "0.7";
+                    ripple.style.animation = "rippleSpread 0.6s ease-out forwards";
+                    this.appendChild(ripple);
+                    setTimeout(()=>ripple.remove(),600);
+                })
+            })
+            // 导航切换
+            const navBtns = document.querySelectorAll('.nav-btn');
+            const modules = document.querySelectorAll('.module');
+            navBtns.forEach(btn=>{
+                btn.addEventListener('click',()=>{
+                    const targetId = btn.dataset.target;
+                    navBtns.forEach(b=>b.classList.remove('active'));
+                    modules.forEach(m=>m.classList.remove('show'));
+                    btn.classList.add('active');
+                    document.getElementById(targetId).classList.add('show');
+                })
+            })
+            // 页面初始化登录检测
+            checkLogin();
         }
-    }
-    sendChatBtn.onclick = sendAiMsg;
-    chatInput.onkeydown = e=>{
-        if(e.key === "Enter") sendAiMsg();
-    }
-    // 水波纹
-    document.querySelectorAll('.ripple-box').forEach(card=>{
-        card.addEventListener('click',function(e){
-            const rect = this.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const ripple = document.createElement('span');
-            ripple.style.position = "absolute";
-            ripple.style.borderRadius = "50%";
-            ripple.style.background = "rgba(190,110,220,0.35)";
-            ripple.style.pointerEvents = "none";
-            ripple.style.width = ripple.style.height = Math.max(rect.width, rect.height) + "px";
-            ripple.style.left = x + "px";
-            ripple.style.top = y + "px";
-            ripple.style.transform = "scale(0)";
-            ripple.style.opacity = "0.7";
-            ripple.style.animation = "rippleSpread 0.6s ease-out forwards";
-            this.appendChild(ripple);
-            setTimeout(()=>ripple.remove(),600);
-        })
-    })
-    // 导航切换
-    const navBtns = document.querySelectorAll('.nav-btn');
-    const modules = document.querySelectorAll('.module');
-    navBtns.forEach(btn=>{
-        btn.addEventListener('click',()=>{
-            const targetId = btn.dataset.target;
-            navBtns.forEach(b=>b.classList.remove('active'));
-            modules.forEach(m=>m.classList.remove('show'));
-            btn.classList.add('active');
-            document.getElementById(targetId).classList.add('show');
-        })
-    })
-    checkLogin();
-}
-</script>
+    </script>
 </body>
 </html>
+
 
