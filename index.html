@@ -48,7 +48,7 @@
             justify-content: center;
             gap: 24px;
             margin-bottom: 3rem;
-            padding: 12 16px;
+            padding: 12px 16px;
             border-radius: 999px;
             background: rgba(255, 255, 255, 0.045);
             backdrop-filter: blur(20px);
@@ -554,7 +554,7 @@
             background: rgba(255, 255, 0.1);
             border-color: rgba(190, 110, 220, 0.25);
         }
-        /* AI对话模块 */
+        /* AI对话模块 气泡新版 */
         .ai-chat-card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
@@ -573,15 +573,41 @@
             padding: 16px;
             margin-bottom: 20px;
         }
+        /* 滚动条美化 */
+        .chat-log::-webkit-scrollbar{
+            width:6px;
+        }
+        .chat-log::-webkit-scrollbar-thumb{
+            background:rgba(255,255,255,0.18);
+            border-radius:3px;
+        }
+        /* 消息气泡核心 */
         .chat-item {
-            margin-bottom: 12px;
-            line-height: 1.6;
+            margin:12px 0;
+            display:flex;
         }
         .user-text {
-            color: #b8d8ff;
+            justify-content: flex-end;
         }
         .ai-text {
-            color: #c9b8ff;
+            justify-content: flex-start;
+        }
+        .msg-box {
+            max-width:85%;
+            padding:10px 14px;
+            line-height:1.55;
+        }
+        .user-text .msg-box{
+            background: rgba(70, 130, 220, 0.32);
+            border: 1px solid rgba(120, 180, 255, 0.25);
+            border-radius: 14px 14px 4px 14px;
+            color:#e0edff;
+        }
+        .ai-text .msg-box{
+            background: rgba(110, 85, 170, 0.28);
+            border: 1px solid rgba(190, 165, 240, 0.22);
+            border-radius: 14px 14px 14px 4px;
+            color:#e4ddf7;
         }
         .chat-input-box {
             display: flex;
@@ -609,6 +635,9 @@
             color:#fff;
             cursor:pointer;
             height:46px;
+        }
+        .chat-btn:hover{
+            opacity:0.9;
         }
         #imgUploadInput {
             display: none;
@@ -1055,11 +1084,14 @@
             const chatLog = document.getElementById("chatLog");
             const chatInput = document.getElementById("chatInput");
             const sendChatBtn = document.getElementById("sendChatBtn");
-            const uploadImgBtn = document.getElementById("imgUploadInput");
+            const uploadImgBtn = document.getElementById("uploadImgBtn");
             const imgUploadInput = document.getElementById("imgUploadInput");
             const previewImgBox = document.getElementById("previewImgBox");
             let loadingTipEl = null;
-            uploadImgBtn.onclick = () => imgUploadInput.click();
+            // 修复上传按钮点击
+            uploadImgBtn.onclick = function() {
+                imgUploadInput.click();
+            };
             imgUploadInput.onchange = function(e){
                 const file = e.target.files[0];
                 if(!file) return;
@@ -1070,12 +1102,15 @@
                 }
                 reader.readAsDataURL(file);
             }
+            // 气泡消息渲染函数（修复滚动报错）
             function addChat(text, isUser){
                 const div = document.createElement("div");
                 div.className = "chat-item " + (isUser ? "user-text" : "ai-text");
-                div.innerHTML = isUser ? `<b>你：</b>${text}` : `<b>AI：</b>${text}`;
+                div.innerHTML = `<div class="msg-box"><b>${isUser ? "你" : "AI"}：</b>${text}</div>`;
                 chatLog.appendChild(div);
-                chatLog.scrollTop = chatLog.scrollHeight;
+                if(chatLog){
+                    chatLog.scrollTop = chatLog.scrollHeight;
+                }
                 return div;
             }
             async function sendAiMsg(){
