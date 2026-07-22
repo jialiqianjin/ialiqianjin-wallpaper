@@ -142,7 +142,7 @@
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 24px;
             padding: 24px;
             display: flex;
@@ -267,7 +267,7 @@
         .song-item {
             padding: 12px 16px;
             border-radius: 12px;
-            background: rgba(255,255,0.05);
+            background: rgba(255,255,255,0.05);
             margin-bottom: 10px;
             cursor: pointer;
             transition: 0.2s;
@@ -371,7 +371,7 @@
             display: none;
         }
         .add-link-box {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 0.03);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.06);
@@ -461,7 +461,7 @@
             position: fixed;
             top: 0;
             left: 0;
-            width 100vw;
+            width: 100vw;
             height: 100vh;
             background: rgba(10, 11, 20, 0.95);
             z-index: 999;
@@ -534,7 +534,7 @@
             position: relative;
             z-index: 99999;
         }
-        .login-tip {
+        .login-t {
             color: #ffadb6;
             font-size: 14px;
             height: 22px;
@@ -550,14 +550,14 @@
         #logoutBtn {
             padding: 8px 20px;
             background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 8px;
             color: #c5cceb;
             cursor: pointer;
             transition: all 0.3s ease;
         }
         #logoutBtn:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 0.1);
             border-color: rgba(190, 110, 220, 0.25);
         }
         /* AI对话模块样式 */
@@ -782,7 +782,7 @@
                     </div>
                 </div>
             </div>
-            <!-- AI对话模块（带图片上传） -->
+            <!-- AI对话模块 -->
             <div class="module" id="aiChatModule">
                 <div class="ai-chat-card ripple-box">
                     <h3 style="text-align:center;margin-bottom:20px;color:#e2e8ff;">AI智能对话 · 支持图文识图</h3>
@@ -807,17 +807,15 @@
         <video id="previewVideo" controls style="display:none;"></video>
     </div>
     <script>
-        // 全局异常捕获，防止JS卡死阻断登录
+        // 全局异常捕获
         window.onerror = function(msg,src,line){
             console.error("JS异常：",msg,src,line);
             const tipDom = document.getElementById("loginTip");
             if(tipDom) tip.textContent = "脚本异常："+msg;
         };
-        // 页面加载完成后再执行所有逻辑，避免DOM未加载绑定失败
         window.onload = function(){
             const ACCESS_PASSWORD = "a12345678945";
             const LOGIN_STORAGE_KEY = "wallLoginAuth";
-            // AI接口配置（已填好）
             const API_BASE = "https://api-dc6d38b3.fastapicloud.dev";
             const API_TOKEN = "a12345678945";
             let chatHistory = [];
@@ -849,7 +847,7 @@
             }
             updateTime();
             setInterval(updateTime, 1000);
-            // 登录核心逻辑
+            // 登录逻辑
             const loginMask = document.getElementById("loginMask");
             const mainWrap = document.getElementById("mainWrap");
             const pwdInput = document.getElementById("pwdInput");
@@ -1061,46 +1059,49 @@
                     }
                 })
             }
-            // AI对话 + 图片上传逻辑【修复兼容版】
+            // ========== AI对话【修复removeChild报错完整版】 ==========
             const chatLog = document.getElementById("chatLog");
             const chatInput = document.getElementById("chatInput");
             const sendChatBtn = document.getElementById("sendChatBtn");
             const uploadImgBtn = document.getElementById("uploadImgBtn");
             const imgUploadInput = document.getElementById("imgUploadInput");
             const previewImgBox = document.getElementById("previewImgBox");
-            // 选择图片
+            let loadingTipEl = null;
+
             uploadImgBtn.onclick = () => imgUploadInput.click();
             imgUploadInput.onchange = function(e){
                 const file = e.target.files[0];
                 if(!file) return;
                 uploadImageFile = file;
-                // 预览
                 const reader = new FileReader();
                 reader.onload = ev => {
                     previewImgBox.innerHTML = `<img class="preview-img-small" src="${ev.target.result}">`;
                 }
                 reader.readAsDataURL(file);
             }
-            // 追加聊天内容
+
             function addChat(text, isUser){
                 const div = document.createElement("div");
                 div.className = "chat-item " + (isUser ? "user-text" : "ai-text");
                 div.innerHTML = isUser ? `<b>你：</b>${text}` : `<b>AI：</b>${text}`;
                 chatLog.appendChild(div);
                 chatLog.scrollTop = chatLog.scrollHeight;
+                return div;
             }
-            // 发送消息【多层兼容修复函数】
+
             async function sendAiMsg(){
                 const text = chatInput.value.trim();
-                if(!text && !uploadImageFile) return alert("请输入提问或上传图片");
+                if(!text && !uploadImageFile) {
+                    alert("请输入提问或上传图片");
+                    return;
+                }
                 if(text){
                     addChat(text, true);
                 }
                 chatInput.value = "";
-                addChat("请求处理中，请稍候...", false);
+                loadingTipEl = addChat("请求处理中，请稍候...", false);
                 try{
                     let reply = "";
-                    // 有图片 → 调用识图接口
                     if(uploadImageFile){
                         const formData = new FormData();
                         formData.append("token", API_TOKEN);
@@ -1111,7 +1112,7 @@
                             body: formData
                         });
                         const data = await res.json();
-                        chatLog.removeChild(chatLog.lastChild);
+                        if(loadingTipEl && loadingTipEl.parentNode) loadingTipEl.remove();
                         console.log("识图原始返回：",data);
                         if(data.error){
                             reply = "错误：" + data.error;
@@ -1122,22 +1123,17 @@
                         }else{
                             reply = "未知返回结构："+JSON.stringify(data,null,1);
                         }
-                        // 清空图片缓存
                         uploadImageFile = null;
                         previewImgBox.innerHTML = "";
                     }else{
-                        // 纯文字对话
                         chatHistory.push({role:"user", content:text});
                         const res = await fetch(`${API_BASE}/v1/chat/completions`,{
                             method:"POST",
                             headers:{"Content-Type":"application/json"},
-                            body:JSON.stringify({
-                                token: API_TOKEN,
-                                messages: chatHistory
-                            })
+                            body:JSON.stringify({token: API_TOKEN, messages: chatHistory})
                         });
                         const data = await res.json();
-                        chatLog.removeChild(chatLog);
+                        if(loadingTipEl && loadingTipEl.parentNode) loadingTipEl.remove();
                         console.log("对话原始返回：",data);
                         if(data.error){
                             reply = "错误：" + data.error;
@@ -1152,9 +1148,10 @@
                     }
                     addChat(reply, false);
                 }catch(err){
-                    chatLog.removeChild(chatLog.lastChild);
+                    if(loadingTipEl && loadingTipEl.parentNode) loadingTipEl.remove();
                     addChat("网络请求失败：" + err.message, false);
                 }
+                loadingTipEl = null;
             }
             sendChatBtn.onclick = sendAiMsg;
             chatInput.onkeydown = e=>{
@@ -1193,11 +1190,11 @@
                     document.getElementById(targetId).classList.add('show');
                 })
             })
-            // 页面初始化登录检测
             checkLogin();
         }
     </script>
 </body>
 </html>
+
 
 
