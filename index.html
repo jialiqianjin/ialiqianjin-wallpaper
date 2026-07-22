@@ -13,7 +13,6 @@
             box-sizing: border-box;
             font-family: "PingFang SC", "Microsoft Yahei", sans-serif;
         }
-
         body {
             background-color: transparent;
             background-image:
@@ -28,7 +27,6 @@
             position: relative;
             overflow-x: hidden;
         }
-
         body::before {
             content: "";
             position: fixed;
@@ -37,7 +35,6 @@
             pointer-events: none;
             z-index: 0;
         }
-
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -45,7 +42,6 @@
             z-index: 1;
             padding: 2rem 1.2rem;
         }
-
         /* 顶端横向导航栏 */
         .nav-bar {
             display: flex;
@@ -62,7 +58,6 @@
             position: relative;
             z-index: 10;
         }
-
         .nav-btn {
             padding: 10px 28px;
             font-size: 1rem;
@@ -73,23 +68,19 @@
             cursor: pointer;
             transition: 0.25s;
         }
-
         .nav-btn.active {
             background: rgba(190, 110, 220, 0.35);
             color: #fff;
         }
-
         .nav-btn:hover {
             background: rgba(255, 255, 255, 0.08);
         }
-
         /* 首页整体布局 */
         .home-wrap {
             display: flex;
             flex-direction: column;
             gap: 2rem;
         }
-
         /* 欢迎卡片：禁止点击、无小手、无波纹，半透毛玻璃 */
         .user-card {
             background: rgba(255, 255, 255, 0.045);
@@ -108,7 +99,6 @@
             overflow: hidden;
             cursor: default;
         }
-
         .avatar {
             width: 86px;
             height: 86px;
@@ -128,7 +118,6 @@
             text-align: center;
             letter-spacing: 1px;
         }
-
         /* 波纹动画移到CSS区，修复JS报错 */
         @keyframes rippleSpread {
             to { transform: scale(2.5); opacity: 0; }
@@ -139,7 +128,6 @@
             overflow: hidden;
             cursor: pointer;
         }
-
         /* 时间+音乐 左右50%并排容器 */
         .row-two-card {
             display: flex;
@@ -149,7 +137,6 @@
         .col-half {
             width: 50%;
         }
-
         /* 时间卡片 高透明样式 */
         .time-card {
             background: rgba(255, 255, 255, 0.03);
@@ -180,7 +167,6 @@
             color: #9aa2c2;
             margin-top: 6px;
         }
-
         /* 首页音乐卡片 高透明样式 */
         .mini-music-card {
             background: rgba(255, 255, 255, 0.03);
@@ -262,7 +248,6 @@
             font-size: 1.3rem;
             cursor: pointer;
         }
-
         /* 音乐模块内部卡片 高透明 */
         .music-set-card {
             background: rgba(255, 255, 255, 0.03);
@@ -302,7 +287,6 @@
         .loop-box label {
             cursor: pointer;
         }
-
         /* 模块切换样式（无弹窗，直接切换） */
         .module {
             display: none;
@@ -315,7 +299,6 @@
             from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         /* 工具/游戏卡片 高透明样式 */
         .tool-card {
             background: rgba(255, 255, 255, 0.03);
@@ -548,7 +531,6 @@
             color: #fff;
             font-size: 1.05rem;
             cursor: pointer;
-            /* 强制提升点击层级，修复移动端点击穿透失效 */
             position: relative;
             z-index: 99999;
         }
@@ -578,7 +560,71 @@
             background: rgba(255, 255, 255, 0.1);
             border-color: rgba(190, 110, 220, 0.25);
         }
-
+        /* AI对话模块样式 */
+        .ai-chat-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .chat-log {
+            height: 400px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .chat-item {
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+        .user-text {
+            color: #b8d8ff;
+        }
+        .ai-text {
+            color: #c9b8ff;
+        }
+        .chat-input-box {
+            display: flex;
+            gap:12px;
+            align-items: center;
+        }
+        #chatInput {
+            flex:1;
+            padding:14px 18px;
+            border-radius:12px;
+            border:1px solid rgba(255,255,255,0.12);
+            background:rgba(0,0,0,0.18);
+            color:#e0e4ff;
+            outline:none;
+        }
+        .chat-sub-buttons {
+            display: flex;
+            gap:10px;
+        }
+        .chat-btn {
+            padding:0 16px;
+            border:none;
+            border-radius:12px;
+            background: linear-gradient(120deg, #7b4bb8, #4f62b3);
+            color:#fff;
+            cursor:pointer;
+            height:46px;
+        }
+        #imgUploadInput {
+            display: none;
+        }
+        .preview-img-small {
+            max-width: 120px;
+            max-height: 120px;
+            border-radius: 8px;
+            margin: 6px 0;
+        }
         /* 移动端适配 */
         @media (max-width:768px) {
             .row-two-card {
@@ -589,6 +635,13 @@
             }
             .greeting h2 {
                 font-size: 2.2rem;
+            }
+            .chat-input-box {
+                flex-direction: column;
+            }
+            .chat-sub-buttons {
+                width: 100%;
+                justify-content: space-between;
             }
         }
     </style>
@@ -603,21 +656,20 @@
             <button id="loginBtn">确认登录</button>
         </div>
     </div>
-
     <div class="main-wrap" id="mainWrap">
         <div class="container">
-            <!-- 导航栏 -->
+            <!-- 导航栏（新增AI对话按钮） -->
             <div class="nav-bar">
                 <button class="nav-btn active" data-target="homeModule">首页</button>
                 <button class="nav-btn" data-target="wallModule">壁纸</button>
                 <button class="nav-btn" data-target="toolModule">极域反杀</button>
                 <button class="nav-btn" data-target="gameModule">游戏</button>
                 <button class="nav-btn" data-target="musicModule">音乐</button>
+                <button class="nav-btn" data-target="aiChatModule">AI对话</button>
             </div>
             <div class="logout-box">
                 <button id="logoutBtn">退出登录</button>
             </div>
-
             <!-- 首页模块（默认显示） -->
             <div class="module show" id="homeModule">
                 <div class="home-wrap">
@@ -669,7 +721,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- 壁纸模块 -->
             <div class="module" id="wallModule">
                 <div class="tool-bar">
@@ -684,7 +735,6 @@
                 </div>
                 <div class="wall-grid" id="wallGrid"></div>
             </div>
-
             <!-- 工具模块 -->
             <div class="module" id="toolModule">
                 <div class="tool-card ripple-box">
@@ -698,7 +748,6 @@
                     <a class="download-exe" href="https://easylink.cc/11e6ix" target="_blank">前往工具箱</a>
                 </div>
             </div>
-
             <!-- 游戏模块 -->
             <div class="module" id="gameModule">
                 <div class="tool-card ripple-box">
@@ -722,7 +771,6 @@
                     <a class="download-exe" href="https://easylink.cc/zob528" target="_blank">前往游玩</a>
                 </div>
             </div>
-
             <!-- 音乐模块 -->
             <div class="module" id="musicModule">
                 <div class="music-page-wrap">
@@ -736,16 +784,30 @@
                     </div>
                 </div>
             </div>
+            <!-- AI对话模块（带图片上传） -->
+            <div class="module" id="aiChatModule">
+                <div class="ai-chat-card ripple-box">
+                    <h3 style="text-align:center;margin-bottom:20px;color:#e2e8ff;">AI智能对话 · 支持图文识图</h3>
+                    <div class="chat-log" id="chatLog"></div>
+                    <input type="file" id="imgUploadInput" accept="image/*">
+                    <div class="chat-input-box">
+                        <input type="text" id="chatInput" placeholder="输入问题，上传图片可识图">
+                        <div class="chat-sub-buttons">
+                            <button class="chat-btn" id="uploadImgBtn">上传图片</button>
+                            <button class="chat-btn" id="sendChatBtn">发送</button>
+                        </div>
+                    </div>
+                    <div id="previewImgBox"></div>
+                </div>
+            </div>
         </div>
     </div>
-
     <!-- 图片预览弹窗 -->
     <div class="preview-mask" id="previewMask">
         <span class="close-preview" id="closePreview">×</span>
         <img id="previewImg" style="display:none;">
         <video id="previewVideo" controls style="display:none;"></video>
     </div>
-
     <script>
         // 全局异常捕获，防止JS卡死阻断登录
         window.onerror = function(msg,src,line){
@@ -753,11 +815,15 @@
             const tipDom = document.getElementById("loginTip");
             if(tipDom) tipDom.textContent = "脚本异常："+msg;
         };
-
         // 页面加载完成后再执行所有逻辑，避免DOM未加载绑定失败
         window.onload = function(){
             const ACCESS_PASSWORD = "a12345678945";
             const LOGIN_STORAGE_KEY = "wallLoginAuth";
+            // AI接口配置（已填好）
+            const API_BASE = "https://api-dc6d38b3.fastapicloud.dev";
+            const API_TOKEN = "a12345678945";
+            let chatHistory = [];
+            let uploadImageFile = null; // 存储选中的图片文件
             const musicList = [
                 {name: "歌曲名称1",artist: "歌手名",cover: "https://via.placeholder.com/100",src: "#"},
                 {name: "歌曲名称2",artist: "歌手名",cover: "https://via.placeholder.com/100",src: "#"}
@@ -774,7 +840,6 @@
                 "https://cropgif.net/videos/1782022932124-66a03516-a7e6-4d51-adc9-ab4ae0923174.mp4",
                 "https://cropgif.net/videos/1782023395596-f40b26d1-fcf6-4a84-bb91-19fcdcfdd61f.mp4"
             ];
-
             // 时间更新
             function updateTime(){
                 const now = new Date();
@@ -786,15 +851,13 @@
             }
             updateTime();
             setInterval(updateTime, 1000);
-
-            // 登录核心逻辑（双重绑定：onclick + addEventListener，彻底修复点击失效）
+            // 登录核心逻辑
             const loginMask = document.getElementById("loginMask");
             const mainWrap = document.getElementById("mainWrap");
             const pwdInput = document.getElementById("pwdInput");
             const loginBtn = document.getElementById("loginBtn");
             const loginTip = document.getElementById("loginTip");
             const logoutBtn = document.getElementById("logoutBtn");
-
             function checkLogin(){
                 try{
                     if(localStorage.getItem(LOGIN_STORAGE_KEY) === "ok"){
@@ -810,7 +873,6 @@
                     loginTip.textContent = "本地存储异常，请清除缓存重试";
                 }
             }
-
             function doLogin(){
                 loginTip.textContent = "";
                 const inputPwd = pwdInput.value.trim();
@@ -822,22 +884,16 @@
                 localStorage.setItem(LOGIN_STORAGE_KEY, "ok");
                 checkLogin();
             }
-
             function doLogout(){
                 localStorage.removeItem(LOGIN_STORAGE_KEY);
                 checkLogin();
             }
-
-            // 双重绑定点击事件，防止单一种绑定失效
             loginBtn.onclick = doLogin;
             loginBtn.addEventListener("click", doLogin);
-            // 回车登录
             pwdInput.onkeydown = function(e){
                 if(e.key === "Enter") doLogin();
             };
-            // 退出登录
             logoutBtn.onclick = doLogout;
-
             // 壁纸渲染
             const wallGrid = document.getElementById('wallGrid');
             const previewMask = document.getElementById('previewMask');
@@ -922,7 +978,6 @@
                 a.click();
                 URL.revokeObjectURL(a.href);
             }
-
             // 音乐播放逻辑
             const miniCover = document.getElementById('miniCover');
             const miniName = document.getElementById('miniName');
@@ -1008,7 +1063,101 @@
                     }
                 })
             }
-
+            // AI对话 + 图片上传逻辑
+            const chatLog = document.getElementById("chatLog");
+            const chatInput = document.getElementById("chatInput");
+            const sendChatBtn = document.getElementById("sendChatBtn");
+            const uploadImgBtn = document.getElementById("uploadImgBtn");
+            const imgUploadInput = document.getElementById("imgUploadInput");
+            const previewImgBox = document.getElementById("previewImgBox");
+            // 选择图片
+            uploadImgBtn.onclick = () => imgUploadInput.click();
+            imgUploadInput.onchange = function(e){
+                const file = e.target.files[0];
+                if(!file) return;
+                uploadImageFile = file;
+                // 预览
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    previewImgBox.innerHTML = `<img class="preview-img-small" src="${ev.target.result}">`;
+                }
+                reader.readAsDataURL(file);
+            }
+            // 追加聊天内容
+            function addChat(text, isUser){
+                const div = document.createElement("div");
+                div.className = "chat-item " + (isUser ? "user-text" : "ai-text");
+                div.innerHTML = isUser ? `<b>你：</b>${text}` : `<b>AI：</b>${text}`;
+                chatLog.appendChild(div);
+                chatLog.scrollTop = chatLog.scrollHeight;
+            }
+            // 发送消息（区分纯文字 / 图文识图）
+            async function sendAiMsg(){
+                const text = chatInput.value.trim();
+                if(!text && !uploadImageFile) return alert("请输入提问或上传图片");
+                if(text){
+                    addChat(text, true);
+                }
+                chatInput.value = "";
+                addChat("请求处理中，请稍候...", false);
+                try{
+                    // 有图片 → 调用识图接口
+                    if(uploadImageFile){
+                        const formData = new FormData();
+                        formData.append("token", API_TOKEN);
+                        formData.append("prompt", text);
+                        formData.append("image", uploadImageFile);
+                        const res = await fetch(`${API_BASE}/image_chat`,{
+                            method:"POST",
+                            body: formData
+                        });
+                        const data = await res.json();
+                        chatLog.removeChild(chatLog.lastChild);
+                        if(data.error){
+                            addChat("识图失败：" + data.error, false);
+                        }else{
+                            let reply = JSON.stringify(data, null, 2);
+                            if(data.output && data.output.choices){
+                                reply = data.output.choices[0].message.content;
+                            }
+                            addChat(reply, false);
+                        }
+                        // 清空图片缓存
+                        uploadImageFile = null;
+                        previewImgBox.innerHTML = "";
+                    }else{
+                        // 纯文字对话
+                        chatHistory.push({role:"user", content:text});
+                        const res = await fetch(`${API_BASE}/v1/chat/completions`,{
+                            method:"POST",
+                            headers:{"Content-Type":"application/json"},
+                            body:JSON.stringify({
+                                token: API_TOKEN,
+                                messages: chatHistory
+                            })
+                        });
+                        const data = await res.json();
+                        chatLog.removeChild(chatLog.lastChild);
+                        if(data.error){
+                            addChat("对话失败：" + data.error, false);
+                            return;
+                        }
+                        let reply = "返回格式异常";
+                        if(data.output && data.output.choices && data.output.choices[0].message){
+                            reply = data.output.choices[0].message.content;
+                        }
+                        chatHistory.push({role:"assistant", content:reply});
+                        addChat(reply, false);
+                    }
+                }catch(err){
+                    chatLog.removeChild(chatLog.lastChild);
+                    addChat("请求出错：" + err.message, false);
+                }
+            }
+            sendChatBtn.onclick = sendAiMsg;
+            chatInput.onkeydown = e=>{
+                if(e.key === "Enter") sendAiMsg();
+            }
             // 全局水波纹
             document.querySelectorAll('.ripple-box').forEach(card=>{
                 card.addEventListener('click',function(e){
@@ -1030,7 +1179,6 @@
                     setTimeout(()=>ripple.remove(),600);
                 })
             })
-
             // 导航切换
             const navBtns = document.querySelectorAll('.nav-btn');
             const modules = document.querySelectorAll('.module');
@@ -1043,7 +1191,6 @@
                     document.getElementById(targetId).classList.add('show');
                 })
             })
-
             // 页面初始化登录检测
             checkLogin();
         }
