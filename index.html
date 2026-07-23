@@ -648,6 +648,119 @@
             border-radius: 8px;
             margin: 6px 0;
         }
+        /* ========== 新增：远程操控面板样式 ========== */
+        .remote-auth-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 11, 20, 0.97);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .remote-auth-box {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(28, 30, 42, 0.88);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 36px 28px;
+            text-align: center;
+        }
+        .remote-auth-box h3 {
+            margin-bottom: 20px;
+            color: #e2e8ff;
+        }
+        #remotePwdInput {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(0,0,0,0.22);
+            color: #e0e4ff;
+            margin-bottom: 16px;
+            outline: none;
+        }
+        .remote-tip {
+            color: #ffadb6;
+            height: 20px;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .remote-btn-group {
+            display: flex;
+            gap: 12px;
+        }
+        .remote-sub-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+        }
+        #remoteConfirmBtn {
+            background: linear-gradient(120deg, #7b4bb8, #4f62b3);
+            color: #fff;
+        }
+        #remoteCancelBtn {
+            background: rgba(255,255,255,0.08);
+            color: #d0d8f0;
+        }
+        /* 远程操控模块面板 */
+        .remote-card {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .remote-card h3 {
+            text-align: center;
+            margin-bottom: 24px;
+            color: #e2e8ff;
+        }
+        .remote-row {
+            margin-bottom: 20px;
+        }
+        .remote-row label {
+            display: block;
+            margin-bottom: 8px;
+            color: #c5cceb;
+        }
+        .remote-input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(0,0,0,0.18);
+            color: #e0e4ff;
+            outline: none;
+        }
+        .remote-op-btn {
+            padding: 12px 24px;
+            margin: 0 8px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(120deg, #7b4bb8, #4f62b3);
+            color: #fff;
+            cursor: pointer;
+        }
+        .remote-op-btn:hover {
+            opacity: 0.92;
+        }
+        .screen-preview-box {
+            margin-top: 24px;
+            text-align: center;
+        }
+        #screenPreviewImg {
+            max-width: 100%;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-top: 12px;
+        }
         /* 移动端适配 */
         @media (max-width:768px) {
             .row-two-card {
@@ -670,6 +783,18 @@
     </style>
 </head>
 <body>
+    <!-- 远程操控密码弹窗【新增】 -->
+    <div class="remote-auth-mask" id="remoteAuthMask">
+        <div class="remote-auth-box">
+            <h3>远程操控验证</h3>
+            <div class="remote-tip" id="remoteTip"></div>
+            <input type="password" id="remotePwdInput" placeholder="请输入远程操控密码">
+            <div class="remote-btn-group">
+                <button class="remote-sub-btn" id="remoteCancelBtn">取消</button>
+                <button class="remote-sub-btn" id="remoteConfirmBtn">验证进入</button>
+            </div>
+        </div>
+    </div>
     <!-- 登录弹窗 -->
     <div class="login-mask" id="loginMask">
         <div class="login-box">
@@ -681,7 +806,7 @@
     </div>
     <div class="main-wrap" id="mainWrap">
         <div class="container">
-            <!-- 导航栏 -->
+            <!-- 导航栏【新增远程操控按钮】 -->
             <div class="nav-bar">
                 <button class="nav-btn active" data-target="homeModule">首页</button>
                 <button class="nav-btn" data-target="wallModule">壁纸</button>
@@ -689,6 +814,8 @@
                 <button class="nav-btn" data-target="gameModule">游戏</button>
                 <button class="nav-btn" data-target="musicModule">音乐</button>
                 <button class="nav-btn" data-target="aiChatModule">AI对话</button>
+                <!-- 新增导航按钮 -->
+                <button class="nav-btn" id="remoteNavBtn">远程操控</button>
             </div>
             <div class="logout-box">
                 <button id="logoutBtn">退出登录</button>
@@ -821,6 +948,28 @@
                     <div id="previewImgBox"></div>
                 </div>
             </div>
+            <!-- ========== 新增：远程操控模块页面 ========== -->
+            <div class="module" id="remoteModule">
+                <div class="remote-card ripple-box">
+                    <h3>连接平板 - 远程操控面板</h3>
+                    <div class="remote-row">
+                        <label>点击坐标 X</label>
+                        <input class="remote-input" id="clickX" placeholder="输入横向坐标，例如500" value="500">
+                    </div>
+                    <div class="remote-row">
+                        <label>点击坐标 Y</label>
+                        <input class="remote-input" id="clickY" placeholder="输入纵向坐标，例如900" value="900">
+                    </div>
+                    <div class="remote-row" style="text-align:center;">
+                        <button class="remote-op-btn" id="sendClickBtn">下发点击指令</button>
+                        <button class="remote-op-btn" id="sendScreenBtn">下发截图指令</button>
+                    </div>
+                    <div class="screen-preview-box">
+                        <h4>平板实时画面预览</h4>
+                        <img id="screenPreviewImg" alt="暂无截图" style="display:none;">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <!-- 图片预览弹窗 -->
@@ -843,6 +992,10 @@
             const API_TOKEN = "a12345678945";
             let chatHistory = [];
             let uploadImageFile = null;
+            // 远程操控全局变量
+            let remoteAuthPass = false;
+            let lastTaskId = "";
+
             const musicList = [
                 {name: "歌曲名称1",artist: "歌手名",cover: "https://via.placeholder.com/100",src: "#"},
                 {name: "歌曲名称2",artist: "歌手名",cover: "https://via.placeholder.com/100",src: "#"}
@@ -1088,7 +1241,6 @@
             const imgUploadInput = document.getElementById("imgUploadInput");
             const previewImgBox = document.getElementById("previewImgBox");
             let loadingTipEl = null;
-            // 修复上传按钮点击
             uploadImgBtn.onclick = function() {
                 imgUploadInput.click();
             };
@@ -1102,7 +1254,6 @@
                 }
                 reader.readAsDataURL(file);
             }
-            // 气泡消息渲染函数（修复滚动报错）
             function addChat(text, isUser){
                 const div = document.createElement("div");
                 div.className = "chat-item " + (isUser ? "user-text" : "ai-text");
@@ -1137,7 +1288,6 @@
                         });
                         const data = await res.json();
                         if(loadingTipEl && loadingTipEl.parentNode) loadingTipEl.remove();
-                        // 多层兼容判断，杜绝未知返回结构
                         if(data.error){
                             reply = "错误：" + data.error;
                         }else if(data.choices && data.choices[0]?.message?.content){
@@ -1210,9 +1360,111 @@
                     navBtns.forEach(b=>b.classList.remove('active'));
                     modules.forEach(m=>m.classList.remove('show'));
                     btn.classList.add('active');
-                    document.getElementById(targetId).classList.add('show');
+                    if(targetId){
+                        document.getElementById(targetId).classList.add('show');
+                    }
                 })
             })
+
+            // ====================== 新增：远程操控密码弹窗逻辑 ======================
+            const remoteNavBtn = document.getElementById("remoteNavBtn");
+            const remoteAuthMask = document.getElementById("remoteAuthMask");
+            const remotePwdInput = document.getElementById("remotePwdInput");
+            const remoteTip = document.getElementById("remoteTip");
+            const remoteConfirmBtn = document.getElementById("remoteConfirmBtn");
+            const remoteCancelBtn = document.getElementById("remoteCancelBtn");
+            // 点击导航远程操控按钮，弹出密码框
+            remoteNavBtn.onclick = async function(){
+                // 已验证直接切页面
+                if(remoteAuthPass){
+                    navBtns.forEach(b=>b.classList.remove('active'));
+                    modules.forEach(m=>m.classList.remove('show'));
+                    this.classList.add("active");
+                    document.getElementById("remoteModule").classList.add("show");
+                    return;
+                }
+                // 未验证，弹出密码弹窗
+                remoteAuthMask.style.display = "flex";
+                remoteTip.textContent = "";
+                remotePwdInput.value = "";
+            }
+            // 取消弹窗
+            remoteCancelBtn.onclick = function(){
+                remoteAuthMask.style.display = "none";
+            }
+            // 验证密码（请求后端接口，前端无明文密码）
+            remoteConfirmBtn.onclick = async function(){
+                const inputPwd = remotePwdInput.value.trim();
+                if(!inputPwd){
+                    remoteTip.textContent = "请输入密码";
+                    return;
+                }
+                try{
+                    const res = await fetch(`${API_BASE}/api/remote_auth?token=${API_TOKEN}&pwd=${encodeURIComponent(inputPwd)}`);
+                    const data = await res.json();
+                    if(data.success){
+                        remoteAuthPass = true;
+                        remoteAuthMask.style.display = "none";
+                        // 切换到远程操控模块
+                        navBtns.forEach(b=>b.classList.remove('active'));
+                        modules.forEach(m=>m.classList.remove('show'));
+                        remoteNavBtn.classList.add("active");
+                        document.getElementById("remoteModule").classList.add("show");
+                    }else{
+                        remoteTip.textContent = data.msg || "密码错误";
+                    }
+                }catch(err){
+                    remoteTip.textContent = "网络请求失败：" + err.message;
+                }
+            }
+            // 密码框回车确认
+            remotePwdInput.onkeydown = e=>{
+                if(e.key === "Enter") remoteConfirmBtn.click();
+            }
+
+            // ====================== 远程操控下发指令逻辑 ======================
+            const sendClickBtn = document.getElementById("sendClickBtn");
+            const sendScreenBtn = document.getElementById("sendScreenBtn");
+            const clickX = document.getElementById("clickX");
+            const clickY = document.getElementById("clickY");
+            const screenPreviewImg = document.getElementById("screenPreviewImg");
+
+            // 下发点击任务
+            sendClickBtn.onclick = async function(){
+                const x = parseInt(clickX.value);
+                const y = parseInt(clickY.value);
+                if(isNaN(x) || isNaN(y) || x <=0 || y <=0){
+                    alert("请输入合法坐标数字");
+                    return;
+                }
+                try{
+                    const url = `${API_BASE}/task/click?x=${x}&y=${y}&token=${API_TOKEN}`;
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    alert("点击指令下发成功，任务ID：" + data.task_id);
+                }catch(err){
+                    alert("下发失败：" + err.message);
+                }
+            }
+            // 下发截图任务 + 自动加载预览图
+            sendScreenBtn.onclick = async function(){
+                try{
+                    const url = `${API_BASE}/task/screenshot?token=${API_TOKEN}`;
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    lastTaskId = data.task_id;
+                    alert("截图指令下发成功，等待3秒自动加载画面");
+                    // 延迟3秒请求图片
+                    setTimeout(async ()=>{
+                        const imgUrl = `${API_BASE}/result/${lastTaskId}?token=${API_TOKEN}`;
+                        screenPreviewImg.src = imgUrl;
+                        screenPreviewImg.style.display = "block";
+                    }, 3000);
+                }catch(err){
+                    alert("下发截图失败：" + err.message);
+                }
+            }
+
             checkLogin();
         }
     </script>
