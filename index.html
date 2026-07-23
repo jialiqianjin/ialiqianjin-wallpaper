@@ -83,10 +83,10 @@
         }
         /* 欢迎卡片：禁止点击、无小手、无波纹 */
         .user-card {
-            background: rgba(255, 255, 255, 0.045);
+            background: rgba(255, 255, 0.045);
             backdrop-filter: blur(22px);
             -webkit-backdrop-filter: blur(22px);
-            border: 1px solid rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 0.07);
             border-radius: 24px;
             padding: 40px 32px;
             display: flex;
@@ -137,12 +137,12 @@
             width: 50%;
         }
         .time-card {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 0.03);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 0.06);
             border-radius: 24px;
-            padding: 24px;
+            padding: 24;
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -677,7 +677,7 @@
             padding: 14px 16px;
             border-radius: 12px;
             border: 1px solid rgba(255,255,0.12);
-            background: rgba(0,0,0,0.22);
+            background: rgba(0,0,0.22);
             color: #e0e4ff;
             margin-bottom: 16px;
             outline: none;
@@ -931,13 +931,13 @@
                     <div id="previewImgBox"></div>
                 </div>
             </div>
-            <!-- 【WebSocket实时远程面板 已替换旧XY输入框】 -->
+            <!-- 远程操控模块 -->
             <div class="module" id="remoteModule">
                 <div class="remote-card ripple-box">
-                    <h3>WebSocket低延迟实时画面｜点击画面直接触控平板</h3>
+                    <h3>WebSocket低延迟实时画面｜点击画面直接触控</h3>
                     <div style="text-align:center;margin-bottom:20px;">
                         <button class="remote-op-btn" id="liveToggleBtn">开启实时画面</button>
-                        <p style="color:#9aa2c2;margin-top:10px;">直接点击预览画面任意位置自动下发点击指令</p>
+                        <p style="color:#9aa2c2;margin-top:10px;">点击画面任意位置下发点击</p>
                     </div>
                     <div class="screen-preview-box">
                         <img id="screenPreviewImg" alt="暂无实时画面" style="max-width:100%;display:none;border-radius:16px;border:1px solid rgba(255,255,0.1);cursor:pointer;">
@@ -954,9 +954,9 @@
     </div>
     <script>
         window.onerror = function(msg,src,line){
-            console.error("JS异常：",msg,src,line);
+            console.error("JS错误：",msg,src,line);
             const tipDom = document.getElementById("loginTip");
-            if(tipDom) tip.textContent = "脚本异常："+msg;
+            if(tipDom) tip.textContent = "页面脚本异常";
         };
         window.onload = function(){
             const ACCESS_PASSWORD = "a12345678945";
@@ -965,13 +965,11 @@
             const API_TOKEN = "a12345678945";
             let chatHistory = [];
             let uploadImageFile = null;
-
-            // ==================== 远程WebSocket全局变量 ====================
+            // 远程全局变量
             let remoteAuthPass = false;
             let wsClient = null;
             let liveRunning = false;
             const WS_ADDR = `wss://api2-cdb3fc20.fastapicloud.dev/ws/client`;
-
             const musicList = [
                 {name: "歌曲名称1",artist: "歌手名",cover: "https://via.placeholder.com/100",src: "#"},
                 {name: "歌曲名称2",artist: "歌手名",cover: "https://via.placeholder.com/100",src: "#"}
@@ -1001,7 +999,7 @@
             updateTime();
             setInterval(updateTime, 1000);
 
-            // 网站登录逻辑
+            // 登录逻辑
             const loginMask = document.getElementById("loginMask");
             const mainWrap = document.getElementById("mainWrap");
             const pwdInput = document.getElementById("pwdInput");
@@ -1020,7 +1018,7 @@
                         mainWrap.style.display = "none";
                     }
                 }catch(e){
-                    loginTip.textContent = "本地存储异常，请清除缓存重试";
+                    loginTip.textContent = "本地存储异常，请清除缓存";
                 }
             }
             function doLogin(){
@@ -1191,7 +1189,7 @@
                 audio.play();
                 playBtn.textContent = "⏸";
             }
-            nextBtn.onclick = nextSong;
+            nextBtn.onclick = next;
             progressWrap.onclick = e=>{
                 const rect = progressWrap.getBoundingClientRect();
                 const per = (e.clientX - rect.left) / rect.width;
@@ -1334,30 +1332,33 @@
                 })
             })
 
-            // 导航切换
+            // ========== 修复导航切换BUG ==========
             const navBtns = document.querySelectorAll('.nav-btn');
             const modules = document.querySelectorAll('.module');
             navBtns.forEach(btn=>{
                 btn.addEventListener('click',()=>{
-                    const targetId = btn.dataset.target;
+                    // 修复原代码 target 未定义报错
+                    const targetId = btn.getAttribute("data-target");
                     navBtns.forEach(b=>b.classList.remove('active'));
                     modules.forEach(m=>m.classList.remove('show'));
                     btn.classList.add('active');
                     if(target){
                         document.getElementById(targetId).classList.add('show');
                     }
-                    // 离开远程模块自动关闭ws
-                    if(targetId !== "remoteModule" && liveRunning){
+                    // 离开远程页面自动关闭ws，防止卡死
+                    if(targetId !== "remoteModule"){
                         liveRunning = false;
-                        if(wsClient) wsClient.close();
-                        wsClient = null;
+                        if(wsClient){
+                            wsClient.close();
+                            wsClient = null;
+                        }
                         document.getElementById("liveToggleBtn").innerText = "开启实时画面";
                         screenPreviewImg.style.display = "none";
                     }
                 })
             })
 
-            // ====================== 远程WebSocket 完整逻辑 ======================
+            // ====================== 远程WebSocket 逻辑 ======================
             const remoteNavBtn = document.getElementById("remoteNavBtn");
             const remoteAuthMask = document.getElementById("remoteAuthMask");
             const remotePwdInput = document.getElementById("remotePwdInput");
@@ -1367,7 +1368,6 @@
             const liveToggleBtn = document.getElementById("liveToggleBtn");
             const screenPreviewImg = document.getElementById("screenPreviewImg");
 
-            // 打开远程按钮
             remoteNavBtn.onclick = async function () {
                 if (remoteAuthPass) {
                     navBtns.forEach(b=>b.classList.remove('active'));
@@ -1408,7 +1408,7 @@
                 }
             }
 
-            // 开启/关闭实时画面WebSocket
+            // 开启/关闭实时画面
             liveToggleBtn.onclick = function(){
                 if(!remoteAuthPass){
                     alert("请先验证远程密码！");
@@ -1425,7 +1425,6 @@
                 liveRunning = true;
                 this.innerText = "关闭实时画面";
                 wsClient = new WebSocket(WS_ADDR);
-                // 接收平板画面base64渲染
                 wsClient.onmessage = ev => {
                     const frame = JSON.parse(ev.data);
                     if(frame.type === "screen"){
@@ -1433,7 +1432,6 @@
                         screenPreviewImg.style.display = "block";
                     }
                 }
-                // 断开2秒自动重连
                 wsClient.onclose = ()=>{
                     if(liveRunning){
                         setTimeout(()=>liveToggleBtn.click(),2000);
@@ -1441,10 +1439,10 @@
                 }
             }
 
-            // 点击画面任意位置下发点击（百分比适配屏幕）
+            // 点击画面下发坐标
             screenPreviewImg.onclick = function(e){
                 if(!wsClient || wsClient.readyState !== WebSocket.OPEN){
-                    alert("实时连接未就绪，请稍等");
+                    alert("实时连接未就绪");
                     return;
                 }
                 const rect = this.getBoundingClientRect();
@@ -1467,4 +1465,5 @@
     </script>
 </body>
 </html>
+
 
