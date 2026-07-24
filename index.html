@@ -272,7 +272,7 @@
             background: rgba(40, 80, 160, 0.2);
         }
         .song-item.active {
-            background: rgba(40, 80, 160, 0.25);
+            background: rgba(40, 80, 0.25);
         }
         .loop-box {
             margin-top: 20px;
@@ -617,7 +617,7 @@
             padding:14px 18px;
             border-radius:12px;
             border:1px solid rgba(255,255,0.12);
-            background:rgba(0,0,0,0.18);
+            background:rgba(0,0,0.18);
             color:#e0e4ff;
             outline:none;
         }
@@ -675,7 +675,7 @@
             padding: 14px 16px;
             border-radius: 12px;
             border: 1px solid rgba(255,255,0.12);
-            background: rgba(0,0,0,0.22);
+            background: rgba(0,0,0.22);
             color: #e0e4ff;
             margin-bottom: 16px;
             outline: none;
@@ -966,6 +966,7 @@
             // 远程全局变量（已移除WebSocket，改用HTTP轮询）
             let remoteAuthPass = false;
             let liveRunning = false;
+            let pollTimer = null;
             const musicList = [
                 {name: "歌曲名称1",artist: "歌手名",cover: "https://via.placeholder.com/100",src: "#"},
                 {name: "歌曲名称2",artist: "歌手名",cover: "https://via.placeholder.com/100",src: "#"}
@@ -1087,7 +1088,6 @@
                             previewVideo.style.display = "block";
                             previewVideo.play();
                         }
-                        previewMask.style.display = "flex";
                     }
                 })
             }
@@ -1321,7 +1321,7 @@
                     setTimeout(()=>ripple.remove(),600);
                 })
             })
-            // ========== 仅修改导航报错行，其余JS全部保留原版 ==========
+            // ========== 仅修改导航判断逻辑，其余JS全部保留原版 ==========
             const navBtns = document.querySelectorAll('.nav-btn');
             const modules = document.querySelectorAll('.module');
             navBtns.forEach(btn=>{
@@ -1330,7 +1330,6 @@
                     navBtns.forEach(b=>b.classList.remove('active'));
                     modules.forEach(m=>m.classList.remove('show'));
                     btn.classList.add("active");
-                    // 修复点：删除未定义变量target，替换为targetId判断
                     if(targetId){
                         document.getElementById(targetId).classList.add('show');
                     }
@@ -1346,7 +1345,7 @@
                     }
                 })
             })
-            // ====================== 远程HTTP轮询持续推流（替换原WebSocket） ======================
+            // ====================== 远程HTTP轮询【唯一修改区域】 ======================
             const remoteNavBtn = document.getElementById("remoteNavBtn");
             const remoteAuthMask = document.getElementById("remoteAuthMask");
             const remotePwdInput = document.getElementById("remotePwdInput");
@@ -1355,10 +1354,6 @@
             const remoteCancelBtn = document.getElementById("remoteCancelBtn");
             const liveToggleBtn = document.getElementById("liveToggleBtn");
             const screenPreviewImg = document.getElementById("screenPreviewImg");
-
-            // 推流固定ID，和AutoJs脚本统一
-            const STREAM_TASK_ID = "screen_stream_001";
-            let pollTimer = null;
 
             remoteNavBtn.onclick = async function () {
                 if (remoteAuthPass) {
@@ -1374,8 +1369,6 @@
             }
             remoteCancelBtn.onclick = ()=> remoteAuthMask.style.display = "none";
             remotePwdInput.onkeydown = e=>{if(e.key === "Enter") remoteConfirmBtn.click();}
-
-            // 密码校验逻辑完全不变
             remoteConfirmBtn.onclick = async function(){
                 const inputPwd = remotePwdInput.value.trim();
                 if(!inputPwd){
@@ -1399,15 +1392,13 @@
                     remoteTip.textContent = "网络请求失败";
                 }
             }
-
-            // 开关实时画面：启动/停止HTTP轮询
+            // 开关实时画面（修复核心：动态获取task_id，不再写死固定id）
             liveToggleBtn.onclick = function(){
                 if(!remoteAuthPass){
                     alert("请先验证远程密码！");
                     return;
                 }
                 if(liveRunning){
-                    // 关闭推流
                     liveRunning = false;
                     clearInterval(pollTimer);
                     pollTimer = null;
@@ -1415,23 +1406,26 @@
                     screenPreviewImg.style.display = "none";
                     return;
                 }
-                // 开启持续拉流
                 liveRunning = true;
                 this.innerText = "关闭实时画面";
                 screenPreviewImg.style.display = "block";
-                // 180ms轮询一次，和AutoJs帧间隔匹配
+                // 每180ms循环：先请求截图task，再拉对应图片
                 pollTimer = setInterval(async ()=>{
                     try{
+                        // 第一步：向服务端申请新截图任务，获取真实task_id
+                        const taskRes = await fetch(`${API_BASE}/task/screenshot?token=${API_TOKEN}`);
+                        const taskData = await taskRes.json();
+                        const realTaskId = taskData.task_id;
+                        // 第二步：用真实id拼接图片地址
                         const ts = Date.now();
-                        const imgUrl = `${API_BASE}/result/${STREAM_TASK_ID}?token=${API_TOKEN}&_t=${ts}`;
+                        const imgUrl = `${API_BASE}/result/${realTaskId}?token=${API_TOKEN}&_t=${ts}`;
                         screenPreviewImg.src = imgUrl;
                     }catch(err){
                         console.log("画面拉取失败", err);
                     }
                 }, 180);
             }
-
-            // 点击图片下发点击任务
+            // 点击图片下发点击任务（比例坐标逻辑不变，完全保留）
             screenPreviewImg.onclick = async function(e){
                 if(!liveRunning){
                     alert("实时画面未开启");
@@ -1442,7 +1436,6 @@
                 const clickY = e.clientY - rect.top;
                 const imgW = rect.width;
                 const imgH = rect.height;
-                // 比例坐标传给后端
                 const scaleX = (clickX / imgW).toFixed(3);
                 const scaleY = (clickY / imgH).toFixed(3);
                 try{
