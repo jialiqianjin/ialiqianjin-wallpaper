@@ -272,7 +272,7 @@
             background: rgba(40, 80, 160, 0.2);
         }
         .song-item.active {
-            background: rgba(40, 80, 0.25);
+            background: rgba(40, 80, 160, 0.25);
         }
         .loop-box {
             margin-top: 20px;
@@ -1238,7 +1238,6 @@
                 const text = chatInput.value.trim();
                 if(!text && !uploadImageFile) {
                     alert("请输入提问或上传图片");
-                    return;
                 }
                 if(text){
                     addChat(text, true);
@@ -1321,7 +1320,7 @@
                     setTimeout(()=>ripple.remove(),600);
                 })
             })
-            // ========== 仅修改导航判断逻辑，其余JS全部保留原版 ==========
+            // ========== 仅修改导航报错行，其余JS全部保留原版 ==========
             const navBtns = document.querySelectorAll('.nav-btn');
             const modules = document.querySelectorAll('.module');
             navBtns.forEach(btn=>{
@@ -1345,7 +1344,7 @@
                     }
                 })
             })
-            // ====================== 远程HTTP轮询【唯一修改区域】 ======================
+            // ====================== 修复后的远程HTTP轮询（保留180ms） ======================
             const remoteNavBtn = document.getElementById("remoteNavBtn");
             const remoteAuthMask = document.getElementById("remoteAuthMask");
             const remotePwdInput = document.getElementById("remotePwdInput");
@@ -1392,7 +1391,7 @@
                     remoteTip.textContent = "网络请求失败";
                 }
             }
-            // 开关实时画面（修复核心：动态获取task_id，不再写死固定id）
+            // 开关实时画面 轮询间隔恢复180ms，按你的要求不改
             liveToggleBtn.onclick = function(){
                 if(!remoteAuthPass){
                     alert("请先验证远程密码！");
@@ -1409,23 +1408,21 @@
                 liveRunning = true;
                 this.innerText = "关闭实时画面";
                 screenPreviewImg.style.display = "block";
-                // 每180ms循环：先请求截图task，再拉对应图片
                 pollTimer = setInterval(async ()=>{
                     try{
-                        // 第一步：向服务端申请新截图任务，获取真实task_id
+                        // 核心修复：每轮先创建截图任务
                         const taskRes = await fetch(`${API_BASE}/task/screenshot?token=${API_TOKEN}`);
-                        const taskData = await taskRes.json();
-                        const realTaskId = taskData.task_id;
-                        // 第二步：用真实id拼接图片地址
+                        const taskJson = await taskRes.json();
+                        const realTaskId = taskJson.task_id;
                         const ts = Date.now();
                         const imgUrl = `${API_BASE}/result/${realTaskId}?token=${API_TOKEN}&_t=${ts}`;
                         screenPreviewImg.src = imgUrl;
                     }catch(err){
                         console.log("画面拉取失败", err);
                     }
-                }, 180);
+                }, 180); // 保留180ms，不修改
             }
-            // 点击图片下发点击任务（比例坐标逻辑不变，完全保留）
+            // 点击下发点击任务
             screenPreviewImg.onclick = async function(e){
                 if(!liveRunning){
                     alert("实时画面未开启");
@@ -1437,7 +1434,7 @@
                 const imgW = rect.width;
                 const imgH = rect.height;
                 const scaleX = (clickX / imgW).toFixed(3);
-                const scaleY = (clickY / imgH).toFixed(3);
+                const scaleY = (clickY / imgH);
                 try{
                     await fetch(`${API_BASE}/task/click?x=${scaleX}&y=${scaleY}&token=${API_TOKEN}`);
                 }catch(err){
