@@ -675,7 +675,7 @@
             padding: 14px 16px;
             border-radius: 12px;
             border: 1px solid rgba(255,255,0.12);
-            background: rgba(0,0,0.22);
+            background: rgba(0,0,0,0.22);
             color: #e0e4ff;
             margin-bottom: 16px;
             outline: none;
@@ -963,11 +963,9 @@
             const API_TOKEN = "a12345678945";
             let chatHistory = [];
             let uploadImageFile = null;
-            // 远程全局变量
+            // 远程全局变量（已移除WebSocket，改用HTTP轮询）
             let remoteAuthPass = false;
-            let wsClient = null;
             let liveRunning = false;
-            const WS_ADDR = `wss://api2-cdb3fc20.fastapicloud.dev/ws/client`;
             const musicList = [
                 {name: "歌曲名称1",artist: "歌手名",cover: "https://via.placeholder.com/100",src: "#"},
                 {name: "歌曲名称2",artist: "歌手名",cover: "https://via.placeholder.com/100",src: "#"}
@@ -1336,19 +1334,19 @@
                     if(targetId){
                         document.getElementById(targetId).classList.add('show');
                     }
-                    // 离开远程页面自动关闭ws，防止卡死
+                    // 离开远程页面自动关闭推流，防止卡死
                     if(targetId !== "remoteModule"){
                         liveRunning = false;
-                        if(wsClient){
-                            wsClient.close();
-                            wsClient = null;
+                        if(pollTimer){
+                            clearInterval(pollTimer);
+                            pollTimer = null;
                         }
                         document.getElementById("liveToggleBtn").innerText = "开启实时画面";
                         screenPreviewImg.style.display = "none";
                     }
                 })
             })
-            // ====================== 远程WebSocket 原始完整逻辑，无删减 ======================
+            // ====================== 远程HTTP轮询持续推流（替换原WebSocket） ======================
             const remoteNavBtn = document.getElementById("remoteNavBtn");
             const remoteAuthMask = document.getElementById("remoteAuthMask");
             const remotePwdInput = document.getElementById("remotePwdInput");
@@ -1357,6 +1355,11 @@
             const remoteCancelBtn = document.getElementById("remoteCancelBtn");
             const liveToggleBtn = document.getElementById("liveToggleBtn");
             const screenPreviewImg = document.getElementById("screenPreviewImg");
+
+            // 推流固定ID，和AutoJs脚本统一
+            const STREAM_TASK_ID = "screen_stream_001";
+            let pollTimer = null;
+
             remoteNavBtn.onclick = async function () {
                 if (remoteAuthPass) {
                     navBtns.forEach(b=>b.classList.remove('active'));
@@ -1371,7 +1374,8 @@
             }
             remoteCancelBtn.onclick = ()=> remoteAuthMask.style.display = "none";
             remotePwdInput.onkeydown = e=>{if(e.key === "Enter") remoteConfirmBtn.click();}
-            // 密码校验 原始代码
+
+            // 密码校验逻辑完全不变
             remoteConfirmBtn.onclick = async function(){
                 const inputPwd = remotePwdInput.value.trim();
                 if(!inputPwd){
@@ -1395,40 +1399,42 @@
                     remoteTip.textContent = "网络请求失败";
                 }
             }
-            // 开启/关闭实时画面 原始代码
+
+            // 开关实时画面：启动/停止HTTP轮询
             liveToggleBtn.onclick = function(){
                 if(!remoteAuthPass){
                     alert("请先验证远程密码！");
                     return;
                 }
                 if(liveRunning){
+                    // 关闭推流
                     liveRunning = false;
-                    if(wsClient) wsClient.close();
-                    wsClient = null;
+                    clearInterval(pollTimer);
+                    pollTimer = null;
                     this.innerText = "开启实时画面";
                     screenPreviewImg.style.display = "none";
                     return;
                 }
+                // 开启持续拉流
                 liveRunning = true;
                 this.innerText = "关闭实时画面";
-                wsClient = new WebSocket(WS_ADDR);
-                wsClient.onmessage = ev => {
-                    const frame = JSON.parse(ev.data);
-                    if(frame.type === "screen"){
-                        screenPreviewImg.src = "data:image/png;base64," + frame.data;
-                        screenPreviewImg.style.display = "block";
+                screenPreviewImg.style.display = "block";
+                // 180ms轮询一次，和AutoJs帧间隔匹配
+                pollTimer = setInterval(async ()=>{
+                    try{
+                        const ts = Date.now();
+                        const imgUrl = `${API_BASE}/result/${STREAM_TASK_ID}?token=${API_TOKEN}&_t=${ts}`;
+                        screenPreviewImg.src = imgUrl;
+                    }catch(err){
+                        console.log("画面拉取失败", err);
                     }
-                }
-                wsClient.onclose = ()=>{
-                    if(liveRunning){
-                        setTimeout(()=>liveToggleBtn.click(),2000);
-                    }
-                }
+                }, 180);
             }
-            // 点击画面下发坐标 原始代码
-            screenPreviewImg.onclick = function(e){
-                if(!wsClient || wsClient.readyState !== WebSocket.OPEN){
-                    alert("实时连接未就绪");
+
+            // 点击图片下发点击任务
+            screenPreviewImg.onclick = async function(e){
+                if(!liveRunning){
+                    alert("实时画面未开启");
                     return;
                 }
                 const rect = this.getBoundingClientRect();
@@ -1436,14 +1442,14 @@
                 const clickY = e.clientY - rect.top;
                 const imgW = rect.width;
                 const imgH = rect.height;
-                const perX = (clickX / imgW).toFixed(3);
-                const perY = (clickY / imgH).toString();
-                const sendData = JSON.stringify({
-                    type: "click",
-                    x: perX,
-                    y: perY
-                });
-                wsClient.send(sendData);
+                // 比例坐标传给后端
+                const scaleX = (clickX / imgW).toFixed(3);
+                const scaleY = (clickY / imgH).toFixed(3);
+                try{
+                    await fetch(`${API_BASE}/task/click?x=${scaleX}&y=${scaleY}&token=${API_TOKEN}`);
+                }catch(err){
+                    console.log("点击指令发送失败", err);
+                }
             }
             checkLogin();
         }
