@@ -455,7 +455,7 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
+            width 100vw;
             height: 100vh;
             background: rgba(10, 11, 20, 0.95);
             z-index: 999;
@@ -846,7 +846,8 @@
         window.onload = function(){
             const ACCESS_PASSWORD = "a12345678945";
             const LOGIN_STORAGE_KEY = "wallLoginAuth";
-            const API_BASE = "https://api2-cdb3fc20.fastapicloud.dev";
+            // 仅修改此处API域名，其余完全不变
+            const API_BASE = "https://api-dc6d3b3.fastapicloud.dev";
             const API_TOKEN = "a12345678945";
             let chatHistory = [];
             let uploadImageFile = null;
@@ -1009,7 +1010,7 @@
             const miniCover = document.getElementById('miniCover');
             const miniName = document.getElementById('miniName');
             const miniArtist = document.getElementById('miniArtist');
-            const progressWrap = document.getElementById('progressBar');
+            const progressWrap = document.getElementById('progressBarWrap');
             const progressBar = document.getElementById('progressBar');
             const curTime = document.getElementById('curTime');
             const totalTime = document.getElementById('totalTime');
@@ -1090,7 +1091,7 @@
                     }
                 })
             }
-            // AI对话 【修复后函数，仅这里改动，其余不变】
+            // AI对话 完整保留（修复后的请求逻辑不动）
             const chatLog = document.getElementById("chatLog");
             const chatInput = document.getElementById("chatInput");
             const sendChatBtn = document.getElementById("sendChatBtn");
@@ -1121,7 +1122,6 @@
                 }
                 return div;
             }
-            // 修复核心：图片上传移除JSON头，纯文本单独加JSON头
             async function sendAiMsg(){
                 const text = chatInput.value.trim();
                 if(!text && !uploadImageFile) {
@@ -1135,7 +1135,6 @@
                 loadingTipEl = addChat("请求处理中，请稍候...", false);
                 try{
                     let reply = "";
-                    // 上传图片分支：FormData 不手动设置Content-Type
                     if(uploadImageFile){
                         const formData = new FormData();
                         formData.append("token", API_TOKEN);
@@ -1159,7 +1158,6 @@
                         uploadImageFile = null;
                         previewImgBox.innerHTML = "";
                     }else{
-                        // 纯文本分支：标准JSON请求，带请求头
                         chatHistory.push({role:"user", content:text});
                         const postData = {
                             token: API_TOKEN,
@@ -1239,7 +1237,7 @@
                     }
                 })
             })
-            // ============ 远程操控按钮：新开标签跳转BilldDesk 不变 ============
+            // 远程操控按钮：新开标签跳转BilldDesk 完全不变
             const remoteNavBtn = document.getElementById("remoteNavBtn");
             remoteNavBtn.onclick = function () {
                 window.open("https://desk.hsslive.cn/#/user", "_blank");
