@@ -156,7 +156,7 @@
         }
         .time-text {
             font-size: 2rem;
-            font-weight: 700;
+            font-weight 700;
             color: #d8e1ff;
             text-shadow: 0 0 18px rgba(60, 120, 200, 0.3);
         }
@@ -646,7 +646,7 @@
             border-radius: 8px;
             margin: 6px 0;
         }
-        /* 远程弹窗 全部隐藏不再使用 */
+        /* 废弃远程相关样式隐藏 */
         .remote-auth-mask, .remote-module {
             display: none !important;
     </style>
@@ -675,15 +675,13 @@
     </div>
     <div class="main-wrap" id="mainWrap">
         <div class="container">
-            <!-- 导航栏 -->
+            <!-- 导航栏（删除极域、游戏、远程按钮） -->
             <div class="nav-bar">
                 <button class="nav-btn" data-target="homeModule">首页</button>
                 <button class="nav-btn" data-target="wallModule">壁纸</button>
-                <button class="nav-btn" data-target="toolModule">极域反杀</button>
-                <button class="nav-btn" data-target="gameModule">游戏</button>
                 <button class="nav-btn" data-target="musicModule">音乐</button>
                 <button class="nav-btn" data-target="aiChatModule">AI对话</button>
-                <button class="nav-btn" id="remoteNavBtn">远程操控</button>
+                <button class="nav-btn" data-target="cloudModule">云盘</button>
             </div>
             <div class="logout-box">
                 <button id="logoutBtn">退出登录</button>
@@ -753,42 +751,6 @@
                 </div>
                 <div class="wall-grid" id="wallGrid"></div>
             </div>
-            <!-- 工具模块 完整保留 -->
-            <div class="module" id="toolModule">
-                <div class="tool-card ripple-box">
-                    <h3>极域工具包</h3>
-                    <p>解除机房极域电子教室限制工具</p>
-                    <a class="download-exe" href="https://link.jiyiho.cn/orfile/down.php/08647e6775a2b7c85db35cbb2bb3e1d4.exe" target="_blank">点击下载exe</a>
-                </div>
-                <div class="tool-card ripple-box">
-                    <h3>夕颜如雪</h3>
-                    <p>多功能机房解除限制工具箱</p>
-                    <a class="download-exe" href="https://easylink.cc/11e6ix" target="_blank">前往工具箱</a>
-                </div>
-            </div>
-            <!-- 游戏模块 完整保留 -->
-            <div class="module" id="gameModule">
-                <div class="tool-card ripple-box">
-                    <h3>LMFP联机软件</h3>
-                    <p>游戏联机工具软件</p>
-                    <a class="download-exe" href="https://easylink.cc/zzlzyk" target="_blank">前往下载/使用</a>
-                </div>
-                <div class="tool-card ripple-box">
-                    <h3>我的世界1.21.11</h3>
-                    <p>MC游戏本体压缩包</p>
-                    <a class="download-exe" href="https://pan.vma.cc/pan/d/f28772c635d62832d5653c728cc1c2bc?ext=zip" target="_blank">网盘下载</a>
-                </div>
-                <div class="tool-card ripple-box">
-                    <h3>Java22</h3>
-                    <p>我的世界Java版运行依赖</p>
-                    <a class="download-exe" href="https://pan.vma.cc/pan/d/12d5093260e9273eafc4404ad1b2c7cc?ext=zip" target="_blank">网盘下载</a>
-                </div>
-                <div class="tool-card ripple-box">
-                    <h3>鸭蛋快跑</h3>
-                    <p>休闲小游戏</p>
-                    <a class="download-exe" href="https://easylink.cc/zob528" target="_blank">前往游玩</a>
-                </div>
-            </div>
             <!-- 音乐模块 完整保留 -->
             <div class="module" id="musicModule">
                 <div class="music-set-card ripple-box">
@@ -816,19 +778,15 @@
                     <div id="previewImgBox"></div>
                 </div>
             </div>
-            <!-- 远程模块 隐藏失效 -->
-            <div class="module remote-module" id="remoteModule">
-                <div class="remote-card ripple-box">
-                    <h3>WebSocket低延迟实时画面｜点击画面直接触控</h3>
-                    <div style="text-align:center;margin-bottom:20px;">
-                        <button class="remote-op-btn" id="liveToggleBtn">开启实时画面</button>
-                        <p style="color:#9aa2c2;margin-top:10px;">点击画面任意位置下发点击</p>
-                    </div>
-                    <div class="screen-preview-box">
-                        <img id="screenPreviewImg" alt="暂无实时画面" style="max-width:100%;display:none;border-radius:16px;border:1px solid rgba(255,255,0.08);cursor:pointer;">
-                    </div>
+            <!-- 云盘模块 完整保留 -->
+            <div class="module" id="cloudModule">
+                <div class="tool-card ripple-box">
+                    <h3>我的云盘</h3>
+                    <p>通过内网穿透访问平板云盘服务</p>
+                    <a class="download-exe" href="http://700b5e2ab48a.ofalias.net:56969" target="_blank">立即打开云盘</a>
                 </div>
             </div>
+            <!-- 已删除：极域反杀模块、游戏模块、远程模块 -->
         </div>
     </div>
     <!-- 大图预览弹窗 -->
@@ -851,7 +809,7 @@
             const API_TOKEN = "a12345678945";
             let chatHistory = [];
             let uploadImageFile = null;
-            // 远程相关变量全部废弃
+            // 远程相关废弃变量保留兼容
             let remoteAuthPass = false;
             let liveRunning = false;
             let pollTimer = null;
@@ -1091,7 +1049,7 @@
                     }
                 })
             }
-            // AI对话 完整保留（修复后的请求逻辑不动）
+            // AI对话 完整保留
             const chatLog = document.getElementById("chatLog");
             const chatInput = document.getElementById("chatInput");
             const sendChatBtn = document.getElementById("sendChatBtn");
@@ -1145,7 +1103,7 @@
                             body: formData
                         });
                         const data = await res.json();
-                        if(loadingTipEl && loadingTipEl.parentNode) loadingTipEl.remove();
+                        if(loadingTipEl && loadingTipEl.parentNode) loadingTip.remove();
                         if(data.error){
                             reply = "错误：" + data.error;
                         }else if(data.choices && data.choices[0]?.message?.content){
@@ -1215,7 +1173,7 @@
                     setTimeout(()=>ripple.remove(),600);
                 })
             })
-            // 导航切换逻辑
+            // 导航切换逻辑（已删除无用按钮，代码兼容）
             const navBtns = document.querySelectorAll('.nav-btn');
             const modules = document.querySelectorAll('.module');
             navBtns.forEach(btn=>{
@@ -1227,8 +1185,8 @@
                     if(targetId){
                         document.getElementById(targetId).classList.add('show');
                     }
-                    // 离开页面清理轮（废弃变量兼容保留）
-                    if(targetId !== "remoteModule"){
+                    // 废弃远程变量兼容
+                    if(target !== "remoteModule"){
                         liveRunning = false;
                         if(pollTimer){
                             clearInterval(pollTimer);
@@ -1237,11 +1195,6 @@
                     }
                 })
             })
-            // 远程操控按钮：新开标签跳转BilldDesk 完全不变
-            const remoteNavBtn = document.getElementById("remoteNavBtn");
-            remoteNavBtn.onclick = function () {
-                window.open("https://desk.hsslive.cn/#/user", "_blank");
-            };
             checkLogin();
         }
     </script>
